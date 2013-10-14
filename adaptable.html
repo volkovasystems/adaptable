@@ -342,14 +342,10 @@
 							$scope.$emit( "pass-controllers", reference );
 							$scope.$broadcast( "pass-controllers", reference );
 							$scope.controllerReference = reference;
-							$timeout( function( ){
-								$scope.$broadcast( "disable-view-type", reference, viewType );
-								var view;
-								if( reference in $scope.viewCache ){
-									view = $scope.viewCache[ reference ];
-								}
-								view.parent.parent( "tr" ).after( view.viewSet.detach( ) );
-							}, 0 );
+							$scope.$broadcast( "disable-view-type", reference, viewType );
+
+							//Transfer when controls are activated.
+							$scope.$broadcast( "transfer-view-set", reference );
 						}else{
 							$scope.controllerReference = null;
 							$scope.$emit( "clear-controllers", reference );
@@ -386,6 +382,35 @@
 								"controllers": $( "div.controllers[parent-reference='" + reference + "']" )
 							}
 							view = $scope.viewCache[ reference ];
+
+							$scope.$on( "transfer-view-set",
+								function( event, reference ){
+									//When the user activate the controllers, put the entire view set near that row.
+
+									//Get the view in the cache.
+									var view;
+									if( reference in $scope.viewCache ){
+										view = $scope.viewCache[ reference ];
+									}else{
+										//If this is possible then this is fatal. Do nothing.
+										return;
+									}
+
+									//Put the view set near the parent.
+									if( "viewSet" in view ){
+										view.parent.parent( "tr" ).after( view.viewSet.detach( ) );
+									}else{
+										/*
+											The view set includes all the tr directly below the tbody near the parent
+												that has the same parent reference as of the reference of the parent.
+											Remember that td that activates it is the parent reference of the view set.
+										*/
+										var viewContainer = view.parent.parents( "tbody" );
+										var viewSet = $( "> tr[parent-reference='" + reference + "']", viewContainer ).detach( );
+										view.parent.parent( "tr" ).after( viewSet );
+										view.viewSet = viewSet;	
+									}
+								} );
 
 							$scope.$on( "adjust-dividers",
 								function( ){
@@ -432,7 +457,7 @@
 												viewControllers.attr( {
 													"reference": reference,
 													"data": "data",
-													"view-type": "view"
+													"view-type": viewType
 												} );
 												view.controllers.append( viewControllers );
 												$compile( view.controllers.children( )[ 0 ] )( $scope );
@@ -535,14 +560,9 @@
 							view.divider.show( );
 							view.spacer.show( );
 
-							//Put the view set near the parent.
-							var viewContainer = view.parent.parents( "tbody" );
-							var viewSet = $( "> tr[parent-reference='" + reference + "']", viewContainer ).detach( );
-							view.parent.parent( "tr" ).after( viewSet );
-							if( !( "viewSet" in view ) ){
-								view.viewSet = viewSet;	
-							}
-						}
+							//Transfer on expanded view set.
+							$scope.$broadcast( "transfer-view-set", reference );
+						} 
 					};
 				} );
 
@@ -554,7 +574,8 @@
 						"controller": "AdaptTableController",
 						"scope": {
 							"reference": "=?",
-							"data": "=?"
+							"data": "=?",
+							"viewType": "@?"
 						},
 						"template":
 							"<button class=\"view-table btn\">" +
@@ -574,35 +595,38 @@
 								"<span>View filters.</span>" +
 							"</button>",
 						"link": function( scope, element ){
-							$timeout( function( ){
-								var container = $( element );
+							var container = $( element );
 
-								var reference = scope.reference;
+							var reference = scope.reference;
+							var currentViewType = scope.viewType;
 
-								container
-									.mouseover( function( ){
-										scope.hoverOn( reference );
-									} )
-									.mouseout( function( ){
-										scope.hoverOff( reference );
-									} );
+							container
+								.mouseover( function( ){
+									scope.hoverOn( reference );
+								} )
+								.mouseout( function( ){
+									scope.hoverOff( reference );
+								} );
 
-								scope.$on( "disable-view-type",
-									function( event, reference, viewType ){
-										if( scope.reference == reference ){
-											container.find( ".view-" + viewType ).prop( "disabled", true );
-										}
-									} );
+							scope.$on( "disable-view-type",
+								function( event, reference, viewType ){
+									if( scope.reference == reference ){
+										container.find( ".view-" + viewType ).prop( "disabled", true );
+										scope.viewType = viewType;
+									}
+								} );
 
-								container
-									.find( "button" )
-									.mouseover( function( ){
-										$( this ).addClass( "btn-primary" );
-									} )
-									.mouseout( function( ){
-										$( this ).removeClass( "btn-primary" );
-									} );
-							}, 0 );
+							//Emit on first.
+							scope.$emit( "disable-view-type", reference, currentViewType );
+
+							container
+								.find( "button" )
+								.mouseover( function( ){
+									$( this ).addClass( "btn-primary" );
+								} )
+								.mouseout( function( ){
+									$( this ).removeClass( "btn-primary" );
+								} );
 						}
 					};
 				} );
@@ -672,264 +696,267 @@
 							"columns": "=?"
 						},
 						"link": function( scope, element ){
-							$timeout( function( ){
-								var container = $( element );
+							var container = $( element );
 
-								if( scope.view ){
-									container.hide( );
-								}
+							if( scope.view ){
+								container.hide( );
+							}
 
-								if( !scope.level ){
-									scope.level = 1;
-								}
-								
-								//This will only auto complete or reduce the row elements.
-								scope.$watch( "header",
-									function(  newValue ){
-										if( newValue !== undefined ){
-											if( !_.isEmpty( scope.body ) ){
-												_.each( scope.body,
-													function( row, index ){
-														var excess = newValue.length - row.length;
-														if( newValue.length > row.length ){
-															//Apply padding.
-															var dummyArray = ( new Array( excess ) ).join( "," ).split( "," );
-															var paddedArray = scope.body[ index ].concat( dummyArray );
-															scope.body[ index ] = paddedArray;
-														}else{
-															//Reduce the array.
-															scope.body[ index ].splice( -1, excess )
-														}
-													} );
-											}
+							if( !scope.level ){
+								scope.level = 1;
+							}
+							
+							//This will only auto complete or reduce the row elements.
+							scope.$watch( "header",
+								function(  newValue ){
+									if( newValue !== undefined ){
+										if( !_.isEmpty( scope.body ) ){
+											_.each( scope.body,
+												function( row, index ){
+													var excess = newValue.length - row.length;
+													if( newValue.length > row.length ){
+														//Apply padding.
+														var dummyArray = ( new Array( excess ) ).join( "," ).split( "," );
+														var paddedArray = scope.body[ index ].concat( dummyArray );
+														scope.body[ index ] = paddedArray;
+													}else{
+														//Reduce the array.
+														scope.body[ index ].splice( -1, excess )
+													}
+												} );
 										}
-									} );
+									}
+								} );
 
-								//Watch for any changes in the views.
-								//Changes will be pushed back to the original data.
-								scope.$watch( "views",
-									function( newValue ){
-										if( newValue !== undefined ){
+							//Watch for any changes in the views.
+							//Changes will be pushed back to the original data.
+							scope.$watch( "views",
+								function( newValue ){
+									if( newValue !== undefined ){
 
+									}
+								} );
+
+							scope.$on( "set-view-type",
+								function( event, reference, viewType ){
+									if( "viewTypeList" in scope ){
+										scope.viewTypeList[ reference ] = viewType;
+									}
+								} );
+
+							//This is for testing purposes only.
+							if( _.isEmpty( scope.data ) ){
+								scope.data = dummyData;
+							}		
+
+							scope.$watch( "data",
+								function( newValue ){
+									if( newValue !== undefined ){
+										scope.header = [ ];
+										scope.body = [ ];
+										scope.views = [ ];
+										scope.viewTypeList = { };
+										scope.viewCache = { };
+
+										//Easiest way to clone the data.
+										var data = JSON.parse( JSON.stringify( scope.data ) );
+
+										if( !( data instanceof Array ) ){
+											data = [ data ];
 										}
-									} );
 
-								scope.$on( "set-view-type",
-									function( event, reference, viewType ){
-										if( "viewTypeList" in scope ){
-											scope.viewTypeList[ reference ] = viewType;
+										//Mark this as default table view.
+										var viewType = "table";
+										if( "reference" in scope ){
+											scope.$emit( "set-view-type", scope.reference, viewType );	
 										}
-									} );
 
-								//This is for testing purposes only.
-								if( _.isEmpty( scope.data ) ){
-									scope.data = dummyData;
-								}		
+										//For handling irregular arrays.
+										var isIrregularArray = false;
+										data = _.map( data,
+											function( value, index ){
+												if( value instanceof Array 
+													|| typeof value != "object" )
+												{
+													isIrregularArray = true;
+													var indexData = { };
+													indexData[ "$" + index ] = value;
+													return indexData;
+												}else{
+													return value;
+												}
+											} );
 
-								scope.$watch( "data",
-									function( newValue ){
-										if( newValue !== undefined ){
-											scope.header = [ ];
-											scope.body = [ ];
-											scope.views = [ ];
-											scope.viewTypeList = { };
-											scope.viewCache = { };
-
-											//Easiest way to clone the data.
-											var data = JSON.parse( JSON.stringify( scope.data ) );
-
-											if( !( data instanceof Array ) ){
-												data = [ data ];
-											}
-
-											//Mark this as default table view.
-											var viewType = "table";
-											if( "reference" in scope ){
-												scope.$emit( "set-view-type", scope.reference, viewType );	
-											}
-
-											//For handling irregular arrays.
-											var isIrregularArray = false;
+										//For normalizing irregular arrays.
+										//This will flatten things.
+										if( isIrregularArray ){
 											data = _.map( data,
 												function( value, index ){
-													if( value instanceof Array 
-														|| typeof value != "object" )
-													{
-														isIrregularArray = true;
+													if( !( /^\$/ ).test( _.keys( value )[ 0 ] ) ){
 														var indexData = { };
 														indexData[ "$" + index ] = value;
-														return indexData;
+														return indexData;		
 													}else{
 														return value;
 													}
 												} );
+											var flattenData = { };
+											_.each( data,
+												function( value ){
+													flattenData = _.extend( flattenData, value );
+												} );
+											data = [ flattenData ];
+										}
 
-											//For normalizing irregular arrays.
-											//This will flatten things.
-											if( isIrregularArray ){
-												data = _.map( data,
-													function( value, index ){
-														if( !( /^\$/ ).test( _.keys( value )[ 0 ] ) ){
-															var indexData = { };
-															indexData[ "$" + index ] = value;
-															return indexData;		
-														}else{
-															return value;
+										//For handling and normalizing headers.
+										_.each( data,
+											function( row, index ){
+												var columns = _.keys( row );
+												
+												var filteredColumns = _.chain( columns )
+													.without( "$reference", "toString" )
+													.map( function( column ){
+														return column.replace( "$", ":" );
+													} )
+													.value( );
+
+												//If there are no columns yet.
+												if( _.isEmpty( scope.header ) ){
+													scope.header = filteredColumns
+												}
+
+												//If the columns change.
+												columns = _.difference( filteredColumns, scope.header );
+												if( !_.isEmpty( columns ) ){
+													scope.header = scope.header.concat( columns ); 
+												}
+											} );
+
+										//Change after header changes.
+										$timeout( function( ){
+											//Measure data density here.
+											if( !scope.columns ){
+												scope.columns = 7;
+											}
+											var currentColumnCount = scope.header.length;
+											var levelRatio = scope.level / scope.columns;
+											var dataDensity = levelRatio * currentColumnCount;
+											var columnCount = currentColumnCount - Math.ceil( dataDensity );
+											columnCount = columnCount + ( columnCount * levelRatio );
+											scope.dataDensity = dataDensity;
+											if( columnCount >= scope.columns ){
+												//Transform to list
+												viewType = "list";
+												if( "reference" in scope ){
+													scope.$emit( "set-view-type", scope.reference, viewType );	
+												}
+
+												scope.header = [ "key", "value" ];
+												if( data.length == 1 ){
+													data = data[ 0 ]; 
+													if( data instanceof Array ){
+														scope.header[ 0 ] = "index";		
+													}else{
+														var keys = _.keys( data ).join( "" ).replace( /[\$\:]/, "" );
+														if( ( /^\d+$/ ).test( keys ) ){
+															scope.header[ 0 ] = "index";						 
 														}
-													} );
-												var flattenData = { };
-												_.each( data,
-													function( value ){
-														flattenData = _.extend( flattenData, value );
-													} );
-												data = [ flattenData ];
+													}
+												}else{
+													scope.header[ 0 ] = "index";
+												}
+												
+												data = _.compact( _.map( data,
+													function( value, key ){
+														if( ( /^\$[-a-zA-Z]+/ ).test( key ) ){
+															return null;
+														}
+
+														if( ( /^\$\d+/ ).test( key ) ){
+															key = key.replace( "$", ":" );
+														}
+
+														if( scope.header[ 0 ] == "index" 
+															&& ( /^\d+$/ ).test( key ) )
+														{
+															key = ":" + key;
+														}
+
+														var thisData = { 
+															"value": value
+														};
+
+														thisData[ scope.header[ 0 ] ] = key;
+
+														return thisData;
+													} ) );
 											}
 
-											//For handling and normalizing headers.
+											var views = [ ];
 											_.each( data,
 												function( row, index ){
-													var columns = _.keys( row );
-													
-													var filteredColumns = _.chain( columns )
-														.without( "$reference", "toString" )
-														.map( function( column ){
-															return column.replace( "$", ":" );
-														} )
-														.value( );
+													//Push data to the right visible columns.
+													scope.body.push( _.without( _.map( scope.header,
+														function( column ){
+															var rowData;
+															if( typeof row[ column ] != "boolean"
+																&& row[ column ] !== 0 )
+															{
+																if( ( /^\:/ ).test( column ) ){
+																	column = column.replace( ":", "$" );
+																}
 
-													//If there are no columns yet.
-													if( _.isEmpty( scope.header ) ){
-														scope.header = filteredColumns
-													}
+																rowData = row[ column ] || "";
 
-													//If the columns change.
-													columns = _.difference( filteredColumns, scope.header );
-													if( !_.isEmpty( columns ) ){
-														scope.header = scope.header.concat( columns ); 
-													}
+																//If this is an object then throw it to views.
+																if( typeof rowData == "object" ){
+																	rowData.$reference = Date.now( ) 
+																		+ Math.round( Math.random( ) * Date.now( ) );
+																	views.push( rowData );
+
+																	Object.defineProperty( rowData, "toString",
+																		{
+																			"enumerable": false,
+																			"configurable": true,
+																			"writable": true,
+																			"value": function toString( ){
+																				return rowData.constructor.name;
+																			}
+																		} ); 
+																}
+															}else{
+																rowData = row[ column ];
+															}
+
+															return rowData
+														} ), null ) );
 												} );
 
-											//Change after header changes.
 											$timeout( function( ){
-												//Measure data density here.
-												if( !scope.columns ){
-													scope.columns = 7;
+												//If this is a view assign a parent reference.
+												if( scope.view ){
+													container
+														.parents( "td, tr" )
+														.each( function( ){
+															if( !$( this ).attr( "parent-reference" ) ){
+																$( this ).attr( "parent-reference", scope.reference );	
+															}
+														} );
+													container
+														.find( "table, thead, tbody, tfoot, tr, th, td" )
+														.each( function( ){
+															if( !$( this ).attr( "parent-reference" ) ){
+																$( this ).attr( "parent-reference", scope.reference );	
+															}
+														} );	
 												}
-												var currentColumnCount = scope.header.length;
-												var levelRatio = scope.level / scope.columns;
-												var dataDensity = levelRatio * currentColumnCount;
-												var columnCount = currentColumnCount - Math.ceil( dataDensity );
-												columnCount = columnCount + ( columnCount * levelRatio );
-												scope.dataDensity = dataDensity;
-												if( columnCount >= scope.columns ){
-													//Transform to list
-													viewType = "list";
-													if( "reference" in scope ){
-														scope.$emit( "set-view-type", scope.reference, viewType );	
-													}
-
-													scope.header = [ "key", "value" ];
-													if( data.length == 1 ){
-														data = data[ 0 ]; 
-														if( data instanceof Array ){
-															scope.header[ 0 ] = "index";		
-														}
-													}else{
-														scope.header[ 0 ] = "index";
-													}
-													
-													data = _.compact( _.map( data,
-														function( value, key ){
-															if( ( /^\$[-a-zA-Z]+/ ).test( key ) ){
-																return null;
-															}
-
-															if( ( /^\$\d+/ ).test( key ) ){
-																key = key.replace( "$", ":" );
-															}
-
-															if( scope.header[ 0 ] == "index" 
-																&& ( /^\d+$/ ).test( key ) )
-															{
-																key = ":" + key;
-															}
-
-															var thisData = { 
-																"value": value
-															};
-
-															thisData[ scope.header[ 0 ] ] = key;
-
-															return thisData;
-														} ) );
-												}
-
-												var views = [ ];
-												_.each( data,
-													function( row, index ){
-														//Push data to the right visible columns.
-														scope.body.push( _.without( _.map( scope.header,
-															function( column ){
-																var rowData;
-																if( typeof row[ column ] != "boolean"
-																	&& row[ column ] !== 0 )
-																{
-																	if( ( /^\:/ ).test( column ) ){
-																		column = column.replace( ":", "$" );
-																	}
-
-																	rowData = row[ column ] || "";
-
-																	//If this is an object then throw it to views.
-																	if( typeof rowData == "object" ){
-																		rowData.$reference = Date.now( ) 
-																			+ Math.round( Math.random( ) * Date.now( ) );
-																		views.push( rowData );
-
-																		Object.defineProperty( rowData, "toString",
-																			{
-																				"enumerable": false,
-																				"configurable": true,
-																				"writable": true,
-																				"value": function toString( ){
-																					return rowData.constructor.name;
-																				}
-																			} ); 
-																	}
-																}else{
-																	rowData = row[ column ];
-																}
-
-																return rowData
-															} ), null ) );
-													} );
-
-												$timeout( function( ){
-													//If this is a view assign a parent reference.
-													if( scope.view ){
-														container
-															.parents( "td, tr" )
-															.each( function( ){
-																if( !$( this ).attr( "parent-reference" ) ){
-																	$( this ).attr( "parent-reference", scope.reference );	
-																}
-															} );
-														container
-															.find( "table, thead, tbody, tfoot, tr, th, td" )
-															.each( function( ){
-																if( !$( this ).attr( "parent-reference" ) ){
-																	$( this ).attr( "parent-reference", scope.reference );	
-																}
-															} );	
-													}
-													//We put it here so that after assigning parent reference to views
-													//	this will not break things.
-													scope.views = views;
-												}, 0 );		
-											}, 0 );	
-										}
-									} );
-							}, 0 );
+												//We put it here so that after assigning parent reference to views
+												//	this will not break things.
+												scope.views = views;
+											}, 0 );		
+										}, 0 );	
+									}
+								} );
 						}
 					};
 				} ); 
@@ -945,84 +972,82 @@
 							"level": "=?"
 						},
 						"link": function( scope, element ){
-							$timeout( function( ){
-								var reference = scope.data.$reference;
-								var viewType = scope.data.$viewType;
-								scope.reference = reference;
-								scope.viewType = viewType;
+							var reference = scope.data.$reference;
+							var viewType = scope.data.$viewType;
+							scope.reference = reference;
+							scope.viewType = viewType;
 
-								var adaptTableView = $( "<adapt-table></adapt-table>" );
-								adaptTableView.attr( {
-									"data": "data",
-									"view": "true",
-									"reference": reference,
-									"level": scope.level
-								} );
-										
-								var container = $( element );
-								container
-									.attr( "reference", reference )
-									.append( adaptTableView );
-
-								$compile( element.contents( ) )( scope );
-
-								$timeout( function( ){
-									var view = $( "adapt-view[reference='" + reference + "']" );
-									if( view.length == 1 ){
-										view.detach( );
-
-										var headerLength = scope.$parent.header.length;
-										
-										var controllers = $( "<div></div>" )
-											.addClass( "controllers col-md-12" )
-											.attr( "parent-reference", reference );
-
-										var identifier = $( "<div></div>" )
-											.addClass( "identifier" )
-											.attr( "parent-reference", reference );
-
-										var viewTd = $( "<td></td>" )
-											.addClass( "sub-container" )
-											.attr( "colspan", headerLength )
-											.mouseover( function( ){
-												scope.hoverOn( reference );
-											} )
-											.mouseout( function( ){
-												scope.hoverOff( reference );
-											} )
-											.append( controllers )
-											.append( identifier )
-											.append( view );
-
-										var viewTr = $( "<tr></tr>" )
-											.append( viewTd )
-											.hide( );
-
-										var dividerTrTop = $( "<tr></tr>" )
-											.addClass( "divider" )
-											.attr( "parent-reference", reference )
-											.hide( );
-
-										var dividerTrBottom = $( "<tr></tr>" )
-											.addClass( "divider" )
-											.attr( "parent-reference", reference )
-											.hide( );
-
-										var spacerTr = $( "<tr></tr>" )
-											.addClass( "spacer" )
-											.attr( "parent-reference", reference )
-											.hide( );
-
-										$( "td[reference='" + reference + "']" )
-											.parent( )
-											.after( spacerTr )
-											.after( dividerTrBottom )
-											.after( viewTr );
-
-										viewTr.before( dividerTrTop );
-									}
-								}, 0 );		
+							var adaptTableView = $( "<adapt-table></adapt-table>" );
+							adaptTableView.attr( {
+								"data": "data",
+								"view": "true",
+								"reference": reference,
+								"level": scope.level
 							} );
+									
+							var container = $( element );
+							container
+								.attr( "reference", reference )
+								.append( adaptTableView );
+
+							$compile( element.contents( ) )( scope );
+
+							$timeout( function( ){
+								var view = $( "adapt-view[reference='" + reference + "']" );
+								if( view.length == 1 ){
+									view.detach( );
+
+									var headerLength = scope.$parent.header.length;
+									
+									var controllers = $( "<div></div>" )
+										.addClass( "controllers col-md-12" )
+										.attr( "parent-reference", reference );
+
+									var identifier = $( "<div></div>" )
+										.addClass( "identifier" )
+										.attr( "parent-reference", reference );
+
+									var viewTd = $( "<td></td>" )
+										.addClass( "sub-container" )
+										.attr( "colspan", headerLength )
+										.mouseover( function( ){
+											scope.hoverOn( reference );
+										} )
+										.mouseout( function( ){
+											scope.hoverOff( reference );
+										} )
+										.append( controllers )
+										.append( identifier )
+										.append( view );
+
+									var viewTr = $( "<tr></tr>" )
+										.append( viewTd )
+										.hide( );
+
+									var dividerTrTop = $( "<tr></tr>" )
+										.addClass( "divider" )
+										.attr( "parent-reference", reference )
+										.hide( );
+
+									var dividerTrBottom = $( "<tr></tr>" )
+										.addClass( "divider" )
+										.attr( "parent-reference", reference )
+										.hide( );
+
+									var spacerTr = $( "<tr></tr>" )
+										.addClass( "spacer" )
+										.attr( "parent-reference", reference )
+										.hide( );
+
+									$( "td[reference='" + reference + "']" )
+										.parent( )
+										.after( spacerTr )
+										.after( dividerTrBottom )
+										.after( viewTr );
+
+									viewTr.before( dividerTrTop );
+								}
+							}, 0 );
 						}
 					}
 				} );
