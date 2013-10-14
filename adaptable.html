@@ -110,7 +110,7 @@
 			}
 
 			adapt-table > table > tbody > tr > td > div.controllers {
-				height: 40px !important;
+				height: 42px !important;
 				border: 1px solid #e0e0e0 !important;
 				margin-bottom: 1px !important;
 				padding: 2px !important;
@@ -422,24 +422,26 @@
 
 							$scope.$on( "pass-controllers",
 								function( event, reference ){
-									view.controllers.removeClass( "controllers-active" );
+									$( ".controllers-active" ).removeClass( "controllers-active" );
 									$scope.controllerReference = reference;
-									if( view.controllers.attr( "parent-reference" ) == reference ){
-										view.controllers.addClass( "controllers-active" );
-										if( !view.controllers.find( "view-controllers" ).length ){
-											var viewControllers = $( "<view-controllers></view-controllers>" );
-											viewControllers.attr( {
-												"reference": reference,
-												"data": "data",
-												"view-type": "view"
-											} );
-											view.controllers.append( viewControllers );
-											$compile( view.controllers.children( )[ 0 ] )( $scope );
+									$timeout( function( ){
+										if( view.controllers.attr( "parent-reference" ) == reference ){
+											view.controllers.addClass( "controllers-active" );
+											if( !view.controllers.find( "view-controllers" ).length ){
+												var viewControllers = $( "<view-controllers></view-controllers>" );
+												viewControllers.attr( {
+													"reference": reference,
+													"data": "data",
+													"view-type": "view"
+												} );
+												view.controllers.append( viewControllers );
+												$compile( view.controllers.children( )[ 0 ] )( $scope );
+											}
+											$timeout( function( ){
+												$scope.$emit( "adjust-dividers" );
+											}, 0 );
 										}
-										$timeout( function( ){
-											$scope.$emit( "adjust-dividers" );
-										}, 0 );
-									}
+									}, 0 );
 								} );
 
 							$scope.$on( "clear-controllers",
@@ -457,6 +459,17 @@
 										activeControllers.removeClass( "controllers-active" );
 									}
 								} );
+
+							//Preformatting for array indices.
+							$( "td > span:contains(':'), th > span:contains(':')" ).each( function( ){
+								var span = $( this );
+								var contents = span.html( );
+								var index = contents.match( /\d+/ );
+								contents = contents.replace( /^\:/, "<i class=\"glyphicon glyphicon-align-justify\"></i>" );
+								span.html( contents );
+								span.attr( "title", "Index: " + index );
+								$( "> i", span ).attr( "title", "Index: " + index );
+							} );
 						}
 
 						$timeout( function( ){
@@ -817,7 +830,12 @@
 
 													scope.header = [ "key", "value" ];
 													if( data.length == 1 ){
-														data = data[ 0 ];
+														data = data[ 0 ]; 
+														if( data instanceof Array ){
+															scope.header[ 0 ] = "index";		
+														}
+													}else{
+														scope.header[ 0 ] = "index";
 													}
 													
 													data = _.compact( _.map( data,
@@ -830,10 +848,19 @@
 																key = key.replace( "$", ":" );
 															}
 
-															return {
-																"key": key,
+															if( scope.header[ 0 ] == "index" 
+																&& ( /^\d+$/ ).test( key ) )
+															{
+																key = ":" + key;
+															}
+
+															var thisData = { 
 																"value": value
 															};
+
+															thisData[ scope.header[ 0 ] ] = key;
+
+															return thisData;
 														} ) );
 												}
 
