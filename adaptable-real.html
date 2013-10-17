@@ -1,185 +1,192 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.min.js"></script>
-		<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-		<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
-		<style>
-			i {
-				margin-right: 3px;
-				cursor: pointer;
-				font-size: 15.5px !important;
-				text-shadow:0.5px 0.5px 2px #a0a0a0 !important;
-			}
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.2/angular.min.js"></script>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+        <style>
+            i {
+                margin-right: 3px;
+                cursor: pointer;
+                font-size: 15.5px !important;
+                text-shadow:0.5px 0.5px 2px #a0a0a0 !important;
+            }
 
-			i.glyphicon-th-list,
-			i.glyphicon-move,
-			i.glyphicon-cog,
-			i.glyphicon-th {
-				transform: scale(0.96,0.96) !important;
-				-ms-transform: scale(0.96,0.96) !important;
-				-webkit-transform: scale(0.96,0.96) !important;
-				-moz-transform: scale(0.96,0.96) !important;
-			}
+            i.glyphicon-th-list,
+            i.glyphicon-move,
+            i.glyphicon-cog,
+            i.glyphicon-th {
+                transform: scale(0.96,0.96) !important;
+                -ms-transform: scale(0.96,0.96) !important;
+                -webkit-transform: scale(0.96,0.96) !important;
+                -moz-transform: scale(0.96,0.96) !important;
+            }
 
-			i.view-type:hover,
-			i.view-controls:hover {
-				text-shadow:0.5px 0.5px 4px #3276b1 !important;	
-			}
+            i.view-type:hover,
+            i.view-controls:hover {
+                text-shadow:0.5px 0.5px 4px #3276b1 !important; 
+            }
 
-			adapt-table {
-				display: block;
-			}
+            adapt-table {
+                display: block;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td >
-				i.button-controller{
-				display: none;
-			}
-			adapt-table > div.table-container > table > tbody > tr > td.parent-view-select > 
-				i.button-controller {
-				display: block !important;
-				float: right !important;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td >
+                i.button-controller{
+                display: none;
+            }
+            adapt-table > div.table-container > table > tbody > tr > td.parent-view-select > 
+                i.button-controller {
+                display: block !important;
+                float: right !important;
+            }
 
-			adapt-table > div.table-container > table > thead > tr > th > span,
-			adapt-table > div.table-container > table > tfoot > tr > th > span {
-				text-transform: capitalize;
-			}
+            adapt-table > div.table-container > table > thead > tr > th > span,
+            adapt-table > div.table-container > table > tfoot > tr > th > span {
+                text-transform: capitalize;
+            }
 
-			adapt-table > div.table-container > table > thead > tr > th {
-				padding: 12px !important;
-			}
+            adapt-table > div.table-container > table > thead > tr > th {
+                padding: 12px !important;
+            }
 
-			adapt-table > div.table-container,
-			adapt-view > adapt-table > div.table-container,
-			adapt-table > div.table-container > table,
-			adapt-view > adapt-table > div.table-container > table {
-				margin: 0px !important;
-				padding: 0px !important;
-			}
+            adapt-table > div.table-container,
+            adapt-view > adapt-table > div.table-container,
+            adapt-table > div.table-container > table,
+            adapt-view > adapt-table > div.table-container > table {
+                margin: 0px !important;
+                padding: 0px !important;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td.sub-container {
-				padding: 0px;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td.sub-container {
+                padding: 0px;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td.view-select,
-			adapt-table > div.table-container > table > tbody > tr > td.view-select:hover {
-				border-top: 1px solid #a0a0a0 !important;
-				border-left: 1px solid #a0a0a0 !important;
-				border-right: 1px solid #a0a0a0 !important;
-				border-bottom: 1px solid #a0a0a0 !important;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td.view-select,
+            adapt-table > div.table-container > table > tbody > tr > td.view-select:hover {
+                border-top: 1px solid #a0a0a0 !important;
+                border-left: 1px solid #a0a0a0 !important;
+                border-right: 1px solid #a0a0a0 !important;
+                border-bottom: 1px solid #a0a0a0 !important;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td.view-expand {
-				padding: 8px !important;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td.view-expand {
+                padding: 8px !important;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > 
-				td.parent-view-select,
-			adapt-table > div.table-container > table > tbody > tr > 
-				td.parent-view-select:hover {
-				border-top: 1px solid #a0a0a0 !important;
-				border-left: 1px solid #a0a0a0 !important;
-				border-right: 1px solid #a0a0a0 !important;
-				border-bottom: 1px solid #a0a0a0 !important;
-				background-color: #909090 !important;
-				color: #ffffff !important;
-			}
+            adapt-table > div.table-container > table > tbody > tr > 
+                td.parent-view-select,
+            adapt-table > div.table-container > table > tbody > tr > 
+                td.parent-view-select:hover {
+                border-top: 1px solid #a0a0a0 !important;
+                border-left: 1px solid #a0a0a0 !important;
+                border-right: 1px solid #a0a0a0 !important;
+                border-bottom: 1px solid #a0a0a0 !important;
+                background-color: #909090 !important;
+                color: #ffffff !important;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > 
-				td.parent-view-select > span,
-			adapt-table > div.table-container > table > tbody > tr > 
-				td.parent-view-select:hover > span{
-				cursor: pointer !important;
-			}
+            adapt-table > div.table-container > table > tbody > tr > 
+                td.parent-view-select > span,
+            adapt-table > div.table-container > table > tbody > tr > 
+                td.parent-view-select:hover > span{
+                cursor: pointer !important;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > 
-				td.parent-view-hover,
-			adapt-table > div.table-container > table > tbody > tr > 
-				td.parent-view-hover:hover {
-				background-color: #5e5e5e !important;
-				color: #ffffff !important;
-			}
+            adapt-table > div.table-container > table > tbody > tr > 
+                td.parent-view-hover,
+            adapt-table > div.table-container > table > tbody > tr > 
+                td.parent-view-hover:hover {
+                background-color: #5e5e5e !important;
+                color: #ffffff !important;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr.divider {
-				width: 100% !important;
-				height: 1px !important;
-				background-color: #a0a0a0 !important;
-			}
+            adapt-table > div.table-container > table > tbody > tr.divider {
+                width: 100% !important;
+                height: 1px !important;
+                background-color: #a0a0a0 !important;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td > div.identifier {
-				width: 4px !important;
-				display: inline-block !important;
-				margin-left: -8px !important;
-				margin-right: 4px !important;
-				background-color: #5e5e5e !important;
-				visibility: hidden;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td > div.identifier {
+                width: 4px !important;
+                display: inline-block !important;
+                margin-left: -8px !important;
+                margin-right: 4px !important;
+                background-color: #5e5e5e !important;
+                visibility: hidden;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td > div.controllers {
-				height: 42px !important;
-				border: 1px solid #e0e0e0 !important;
-				margin-bottom: 1px !important;
-				padding: 2px !important;
-				display: none;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td > div.controllers {
+                height: 42px !important;
+                border: 1px solid #e0e0e0 !important;
+                margin-bottom: 1px !important;
+                padding: 2px !important;
+                display: none;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td > 
-				div > view-controllers > button:first-child {
-				margin-right: 1px;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td div.overview {
+                height: 42px !important;
+                border: 1px solid #e0e0e0 !important;
+                margin-bottom: 1px !important;
+                padding: 2px !important;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td > 
-				div > view-controllers > button:last-child {
-				margin-left: 1px;
-				margin-right: 0px !important;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td > 
+                div > view-controllers > button:first-child {
+                margin-right: 1px;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td > 
-				div > view-controllers > button:nth-child(n+1) {
-				margin-left: 1px;
-				margin-right: 1px;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td > 
+                div > view-controllers > button:last-child {
+                margin-left: 1px;
+                margin-right: 0px !important;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td > 
-				div.controllers-active {
-				display: block !important;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td > 
+                div > view-controllers > button:nth-child(n+1) {
+                margin-left: 1px;
+                margin-right: 1px;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td > 
-				div.controllers-active button.btn {
-				border-radius: 0px;
-				-moz-border-radius: 0px;
-				-webkit-border-radius: 0px;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td > 
+                div.controllers-active {
+                display: block !important;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td > 
-				div.controllers-active > view-controllers {
-				display: block;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td > 
+                div.controllers-active button.btn {
+                border-radius: 0px;
+                -moz-border-radius: 0px;
+                -webkit-border-radius: 0px;
+            }
 
-			adapt-table > div.table-container > table > tbody > tr > td > adapt-view {
-				display: inline-block !important;
-				margin-left: 0px !important;
-				padding: 0px !important;
-				width: 100% !important;
-			}
+            adapt-table > div.table-container > table > tbody > tr > td > 
+                div.controllers-active > view-controllers {
+                display: block;
+            }
 
-			@media screen and (max-width: 600px) {
-				adapt-table > div.table-container > table > tbody > tr > td > 
-					div > view-controllers > button > span {
-					display: none !important;
-				}
-				adapt-table > div.table-container > table > tbody > tr > td > 
-					div > view-controllers > button > i {
-					margin-right: 0px !important;
-				}
-			}
-		</style>
-		<script>
-			var data = [
+            adapt-table > div.table-container > table > tbody > tr > td > adapt-view {
+                display: inline-block !important;
+                margin-left: 0px !important;
+                padding: 0px !important;
+                width: 100% !important;
+            }
+
+            @media screen and (max-width: 600px) {
+                adapt-table > div.table-container > table > tbody > tr > td > 
+                    div > view-controllers > button > span {
+                    display: none !important;
+                }
+                adapt-table > div.table-container > table > tbody > tr > td > 
+                    div > view-controllers > button > i {
+                    margin-right: 0px !important;
+                }
+            }
+        </style>
+        <script>
+            var data = [
                 {
                     "id": 0,
                     "name": "Fannie Hancock",
@@ -3646,846 +3653,928 @@
                     ]
                 }
             ];
-			
-
-			var adaptTable = angular.module( "adaptable", [ ] );
-			adaptTable.constant( "dummyData", data );
-			adaptTable.controller( "AdaptTableController",
-				function( $scope, $timeout, $compile ){
-
-					$scope.activateControllers = function activateControllers( reference, viewType ){
-						if( $scope.controllerReference != reference ){
-							$scope.$emit( "pass-controllers", reference );
-							$scope.$broadcast( "pass-controllers", reference );
-							$scope.$broadcast( "disable-view-type", reference, viewType );
-
-							//Transfer when controls are activated.
-							$scope.$broadcast( "transfer-view-set", reference );
-							$scope.$broadcast( "close-view", reference, viewType, true );
-						}else{
-							$scope.$emit( "clear-controllers", reference );
-							$scope.$broadcast( "clear-controllers", reference );
-						}
-					}
-
-					$scope.hoverOn = function hoverOn( reference ){
-						$scope.$emit( "hover-on", reference || $scope.reference );
-					};
-
-					$scope.hoverOff = function hoverOff( reference ){
-						$scope.$emit( "hover-off", reference || $scope.reference );
-					};
-
-					$scope.clickView = function clickView( reference, viewType ){
-						var parentViewType = viewType;
-						var parentReference = reference;
-
-						var view;
-						if( parentReference in $scope.viewCache ){
-							view = $scope.viewCache[ parentReference ];
-						}else{
-							$scope.$broadcast( "set-body", parentReference );
-
-							$timeout( function( ){
-								view = $( "adapt-view[reference='" + parentReference + "']" );
-								var aTable = $( "> adapt-table", view );	
-								$scope.viewCache[ parentReference ] = {
-									"self": view,
-									"aTable": aTable,
-									"parent": $( "td[reference='" + parentReference + "']" ),
-									"container": aTable.parents( "tr[parent-reference='" + parentReference + "']" ),
-									"subContainer": aTable.parents( "td[parent-reference='" + parentReference + "']" ),
-									"divider": $( "tr.divider[parent-reference='" + parentReference + "']" ),
-									"spacer": $( "tr.spacer[parent-reference='" + parentReference + "']" ),
-									"identifier": $( "div.identifier[parent-reference='" + parentReference + "']" ),
-									"controllers": $( "div.controllers[parent-reference='" + parentReference + "']" )
-								}
-								view = $scope.viewCache[ parentReference ];
-
-								$scope.$on( "transfer-view-set",
-									function( event, reference ){
-										//When the user activate the controllers, put the entire view set near that row.
-
-										//Get the view in the cache.
-										var view;
-										if( reference in $scope.viewCache ){
-											view = $scope.viewCache[ reference ];
-										}else{
-											//If this is possible then this is fatal. Do nothing.
-											return;
-										}
-
-										//Put the view set near the parent.
-										if( "viewSet" in view ){
-											view.parent.parent( "tr" ).after( view.viewSet.detach( ) );
-										}else{
-											/*
-												The view set includes all the tr directly below the tbody near the parent
-													that has the same parent reference as of the reference of the parent.
-												Remember that td that activates it is the parent reference of the view set.
-											*/
-											var viewContainer = view.parent.parents( "tbody" );
-											var viewSet = $( "> tr[parent-reference='" + reference + "']", viewContainer ).detach( );
-											view.parent.parent( "tr" ).after( viewSet );
-											view.viewSet = viewSet;	
-										}
-									} );
-
-								$scope.$on( "adjust-dividers",
-									function( ){
-										view.identifier.css( "height", view.self.height( ) );
-									} );
-
-								$scope.$on( "hover-on",
-									function( event, reference ){
-										if( !view.aTable.hasClass( "viewable" ) ){
-											if( view.identifier.attr( "parent-reference" ) == reference ){
-												view.parent.addClass( "parent-view-hover" );
-											}
-											return;
-										}
-										if( view.identifier.attr( "parent-reference" ) == reference ){
-											view.identifier.css( "visibility", "visible" );
-											view.parent.addClass( "parent-view-hover" );
-										}
-									} );
-
-								$scope.$on( "hover-off",
-									function( event, reference ){
-										if( !view.aTable.hasClass( "viewable" ) ){
-											if( view.identifier.attr( "parent-reference" ) == reference ){
-												view.parent.removeClass( "parent-view-hover" );
-											}
-											return;
-										}
-										if( view.identifier.attr( "parent-reference" ) == reference ){
-											view.identifier.css( "visibility", "hidden" );
-											view.parent.removeClass( "parent-view-hover" );
-										}
-									} );
-
-								$scope.$on( "pass-controllers",
-									function( event, reference ){
-										$( ".controllers-active" ).removeClass( "controllers-active" );
-										$scope.controllerReference = reference;
-										$timeout( function( ){
-											if( view.controllers.attr( "parent-reference" ) == reference ){
-												view.controllers.addClass( "controllers-active" );
-												if( !view.controllers.find( "view-controllers" ).length ){
-													var viewControllers = $( "<view-controllers></view-controllers>" );
-													viewControllers.attr( {
-														"reference": reference,
-														"data": "data",
-														"view-type": viewType
-													} );
-													view.controllers.append( viewControllers );
-													$compile( view.controllers.children( )[ 0 ] )( $scope );
-												}
-												$timeout( function( ){
-													$scope.$emit( "adjust-dividers" );
-												}, 0 );
-											}
-										}, 0 );
-									} );
-
-								$scope.$on( "clear-controllers",
-									function( event, reference ){
-										$scope.controllerReference = null;
-										if( view.controllers.attr( "parent-reference" ) == reference ){
-											view.controllers.removeClass( "controllers-active" );
-											$timeout( function( ){
-												$scope.$emit( "adjust-dividers" );
-											}, 0 );
-										}
-										var activeControllers = $( "adapt-view[reference='" + reference + "']" )
-											.find( ".controllers-active" );
-										if( activeControllers.length ){
-											activeControllers.removeClass( "controllers-active" );
-										}
-									} );
-
-								$scope.$on( "close-view",
-									function( event, reference, viewType, closeChildrens ){
-										if( parentReference != reference ){
-											//We invert things because we are traversing the child and every child claims
-											//	to be the parent so the reference will be the parent and the parentReference is the child.
-											//What we want to check here if the child reference is a valid child of the parent reference.
-											if( !( $( "*[parent-reference='" + reference + "']" )
-												.find( "*[parent-reference='" + parentReference + "']" ).length ) )
-											{
-												return;
-											}
-										}
-
-										//This will force to close only all childrens.
-										if( closeChildrens
-											&& parentReference == reference )
-										{
-											return;
-										}
-
-										$timeout( function( ){
-											$scope.$emit( "adjust-dividers" );
-										}, 0 );
-
-										view.aTable.removeClass( "viewable" );
-										view.aTable.hide( );
-
-										var iconTypeCollapse = "glyphicon-th-large";
-										var iconTypeExpand = "glyphicon-th";
-										switch( viewType ){
-											case "map":
-												iconTypeCollapse = "glyphicon-move";
-												iconTypeExpand = "glyphicon-fullscreen";
-												break;
-
-											case "list":
-												iconTypeCollapse = "glyphicon-th-list";
-												iconTypeExpand = "glyphicon-list";
-												break;
-										}
-										
-										//There should only be one of this.
-										view.parent.removeClass( "parent-view-select" );
-										view.parent.find( "i.view-type" )
-											.removeClass( iconTypeExpand )
-											.addClass( iconTypeCollapse );
-										
-										view.subContainer
-											.removeClass( "view-select" )
-											.removeClass( "view-expand" );
-										
-										view.container
-											.removeClass( "view-select" )
-											.hide( );
-
-										view.divider.hide( );
-										view.spacer.hide( );
-
-										$scope.$emit( "clear-controllers", reference );
-										$scope.$broadcast( "clear-controllers", reference );
-									} );
-
-								$scope.$on( "click-view",
-									function( event, reference, viewType ){
-										if( parentReference != reference ){
-											return;
-										}
-
-										if( view.aTable.hasClass( "viewable" ) ){
-											$scope.$broadcast( "close-view", reference, viewType );
-											return;
-										}
-
-										$timeout( function( ){
-											$scope.$emit( "adjust-dividers" );
-										}, 0 );
-
-										var iconTypeCollapse = "glyphicon-th-large";
-										var iconTypeExpand = "glyphicon-th";
-										switch( viewType ){
-											case "map":
-												iconTypeCollapse = "glyphicon-move";
-												iconTypeExpand = "glyphicon-fullscreen";
-												break;
-
-											case "list":
-												iconTypeCollapse = "glyphicon-th-list";
-												iconTypeExpand = "glyphicon-list";
-												break;
-										}
-
-										view.aTable.addClass( "viewable" );
-										view.aTable.show( );
-										
-										//There should only be one of this.
-										view.parent.addClass( "parent-view-select" );
-										view.parent.find( "i.view-type" )
-											.addClass( iconTypeExpand )
-											.removeClass( iconTypeCollapse );
-
-										view.subContainer
-											.addClass( "view-select" )
-											.addClass( "view-expand" );
-										
-										view.container
-											.addClass( "view-select" )
-											.show( );
-
-										view.divider.show( );
-										view.spacer.show( );
-
-										//Transfer on expanded view set.
-										$scope.$broadcast( "transfer-view-set", reference );
-									} );
-
-								$scope.$emit( "click-view", parentReference, parentViewType );
-							}, 0 );
-
-							return;
-						}
-
-						$scope.$emit( "click-view", parentReference, parentViewType );
-					};
-				} );
-
-			adaptTable.directive( "viewControllers",
-				function( $timeout, $compile ){
-					return {
-						"require": "?^",
-						"restrict": "E",
-						"controller": "AdaptTableController",
-						"scope": {
-							"reference": "=?",
-							"data": "=?",
-							"viewType": "@?"
-						},
-						"template":
-							"<button class=\"view-table btn\">" +
-								"<i class=\"glyphicon glyphicon-th-large\"></i>" +
-								"<span>View as table.</span>" +
-							"</button>" +
-							"<button class=\"view-list btn\">" +
-								"<i class=\"glyphicon glyphicon-th-list\"></i>" +
-								"<span>View as list.</span>" +
-							"</button>" +
-							"<button class=\"view-map btn\">" +
-								"<i class=\"glyphicon glyphicon-move\"></i>" +
-								"<span>View as map.</span>" +
-							"</button>" +
-							"<button class=\"view-map btn\">" +
-								"<i class=\"glyphicon glyphicon-filter\"></i>" +
-								"<span>View filters.</span>" +
-							"</button>" + 
-							"<button class=\"view-overview btn\">" +
-								"<i class=\"glyphicon glyphicon-info-sign\"></i>" +
-								"<span>View overviews.</span>" +
-							"</button>",
-						"link": function( scope, element ){
-							var container = $( element );
-
-							var reference = scope.reference;
-							var currentViewType = scope.viewType;
-
-							container
-								.mouseover( function( ){
-									scope.hoverOn( reference );
-								} )
-								.mouseout( function( ){
-									scope.hoverOff( reference );
-								} );
-
-							scope.$on( "disable-view-type",
-								function( event, reference, viewType ){
-									if( scope.reference == reference ){
-										container.find( ".view-" + viewType ).prop( "disabled", true );
-										scope.viewType = viewType;
-									}
-								} );
-
-							//Emit on first.
-							scope.$emit( "disable-view-type", reference, currentViewType );
-
-							container
-								.find( "button" )
-								.mouseover( function( ){
-									$( this ).addClass( "btn-primary" );
-								} )
-								.mouseout( function( ){
-									$( this ).removeClass( "btn-primary" );
-								} );
-						}
-					};
-				} );
-
-			adaptTable.directive( "viewOverviews",
-				function( $timeout, $compile ){
-					return {
-						"require": "?^",
-						"restrict": "E",
-						"controller": "AdaptTableController",
-						"scope": {
-							"reference": "=?",
-							"data": "=?",
-						},
-						"template": "",
-						"link": function( scope, element ){
-							var container = $( element );
-
-							var reference = scope.reference;
-							
-						}
-					};
-				} );
-
-			
-
-			adaptTable.directive( "adaptTable",
-				function( dummyData, $timeout, $compile ){
-					return {
-						"require": "?^",
-						"restrict": "E",
-						"controller": "AdaptTableController",
-						"template": "<div class=\"table-container col-xs-12 col-sm-12 col-md-12\">" +
-										"<table class=\"col-xs-12 col-sm-12 col-md-12 table table-hover table-bordered table-striped\">" +
-											"<thead>" +
-												"<tr>" +
-													"<th ng-repeat=\"column in header track by $index\"" +
-														"column=\"{{ column }}\">" +
-														"<span ng-bind=\"column\"></span>" +
-													"</th>" +
-												"</tr>" +
-											"</thead>" +
-											"<tbody>" +
-												"<tr ng-repeat=\"row in body track by $index\">" +
-													"<td ng-repeat=\"cell in row track by $index\" " +
-														"reference=\"{{ cell.$reference }}\" " + 
-														"ng-mouseover=\"hoverOn( cell.$reference )\" " +
-														"ng-mouseleave=\"hoverOff( cell.$reference )\" " +
-														"ng-click=\"clickView( cell.$reference, viewTypeList[ cell.$reference ] )\">" +
-														
-														"<i class=\"view-type glyphicon glyphicon-th-large\" "
-															+ "ng-if=\"cell.$reference && viewTypeList[ cell.$reference ] == 'table'\"></i>" +
-														"<i class=\"view-type glyphicon glyphicon-th-list\" "
-															+ "ng-if=\"cell.$reference && viewTypeList[ cell.$reference ] == 'list'\"></i>" +
-														"<i class=\"view-type glyphicon glyphicon-move\" "
-															+ "ng-if=\"cell.$reference && viewTypeList[ cell.$reference ] == 'map'\"></i>" +
-														"<i class=\"view-controls glyphicon glyphicon-cog button-controller\" " +
-															"ng-show=\"controllerReference == cell.$reference\" " +
-															"ng-click=\"activateControllers( cell.$reference, viewTypeList[ cell.$reference ] );"
-																+ " $event.stopPropagation( );\" " +
-															"ng-if=\"cell.$reference\"></i>" +
-														
-														"<span ng-bind=\"cell\"></span>" +
-													"</td>" +
-												"</tr>" +
-												"<adapt-view "+
-													"class=\"col-md-12\" " +
-													"ng-repeat=\"view in views track by $index\" " +
-													"ng-mouseover=\"hoverOn( )\" " +
-													"ng-mouseleave=\"hoverOff( )\" " +
-													"level=\"( level + 1 )\" " +
-													"view-type=\"viewType\" " + 
-													"data=\"view\">" +
-												"</adapt-view>" +
-											"</tbody>" +
-											"<tfoot>" +
-												"<tr>" +
-													"<th ng-repeat=\"column in header track by $index\"" +
-														"column=\"{{ column }}\">" +
-														"<span ng-bind=\"column\"></span>" +
-													"</th>" +
-												"</tr>" +
-											"</tfoot>" +
-										"</table>" +
-									"</div>",
-						"scope": {
-							"data": "=?",
-							"view": "=?",
-							"reference": "=?",
-							"level": "=?",
-							"columns": "=?"
-						},
-						"link": function( scope, element ){
-							var container = $( element );
-
-							if( scope.view ){
-								container.hide( );
-							}
-
-							if( !scope.level ){
-								scope.level = 1;
-							}
-							
-							//This will only auto complete or reduce the row elements.
-							scope.$watch( "header",
-								function(  newValue ){
-									if( newValue !== undefined ){
-										if( !_.isEmpty( scope.body ) ){
-											_.each( scope.body,
-												function( row, index ){
-													var excess = newValue.length - row.length;
-													if( newValue.length > row.length ){
-														//Apply padding.
-														var dummyArray = ( new Array( excess ) ).join( "," ).split( "," );
-														var paddedArray = scope.body[ index ].concat( dummyArray );
-														scope.body[ index ] = paddedArray;
-													}else{
-														//Reduce the array.
-														scope.body[ index ].splice( -1, excess )
-													}
-												} );
-										}
-									}
-								} );
-
-							//Watch for any changes in the views.
-							//Changes will be pushed back to the original data.
-							scope.$watch( "views",
-								function( newValue ){
-									if( newValue !== undefined ){
-
-									}
-								} );
-
-							scope.$on( "set-view-type",
-								function( event, reference, viewType ){
-									if( "viewTypeList" in scope ){
-										scope.viewTypeList[ reference ] = viewType;
-									}
-								} );
-
-							scope.$on( "set-body",
-								function( event, reference ){
-									if( scope.reference == reference ){
-										if( scope.view ){
-											scope.body = scope.preBody;	
-										}
-										
-										$timeout( function( ){
-											//If this is a view assign a parent reference.
-											if( scope.view ){
-												container
-													.parents( "td, tr" )
-													.each( function( ){
-														if( !$( this ).attr( "parent-reference" ) ){
-															$( this ).attr( "parent-reference", scope.reference );	
-														}
-													} );
-												container
-													.find( "table, thead, tbody, tfoot, tr, th, td" )
-													.each( function( ){
-														if( !$( this ).attr( "parent-reference" ) ){
-															$( this ).attr( "parent-reference", scope.reference );	
-														}
-													} );
-
-												scope.views = scope.preViews;
-											}
-
-											//Preformatting for array indices.
-											$( "td > span:contains(':'), th > span:contains(':')" )
-												.each( function( ){
-													var span = $( this );
-													var contents = span.html( );
-													var index = contents.match( /\d+/ );
-													contents = contents.replace( /^\:/, "<i class=\"glyphicon glyphicon-align-justify\"></i>" );
-													span.html( contents );
-													span.attr( "title", "Index: " + index );
-													$( "> i", span ).attr( "title", "Index: " + index );
-												} );
-										}, 0 );
-									}
-								} );
-
-							//This is for testing purposes only.
-							if( _.isEmpty( scope.data ) && !scope.view ){
-								scope.data = dummyData;
-							}		
-
-							scope.$watch( "data",
-								function( newValue ){
-									if( newValue !== undefined ){
-										scope.header = [ ];
-										scope.body = [ ];
-										scope.views = [ ];
-										scope.viewTypeList = { };
-										scope.viewCache = { };
-
-										//Easiest way to clone the data.
-										var data = JSON.parse( JSON.stringify( scope.data ) );
-
-										if( !( data instanceof Array ) ){
-											data = [ data ];
-										}
-
-										//Mark this as default table view.
-										var viewType = "table";
-										if( "reference" in scope ){
-											scope.$emit( "set-view-type", scope.reference, viewType );	
-										}
-
-										//For handling irregular arrays.
-										var isIrregularArray = false;
-										data = _.map( data,
-											function( value, index ){
-												if( value instanceof Array 
-													|| typeof value != "object" )
-												{
-													isIrregularArray = true;
-													var indexData = { };
-													indexData[ "$" + index ] = value;
-													return indexData;
-												}else{
-													return value;
-												}
-											} );
-
-										//For normalizing irregular arrays.
-										//This will flatten things.
-										if( isIrregularArray ){
-											data = _.map( data,
-												function( value, index ){
-													if( !( /^\$/ ).test( _.keys( value )[ 0 ] ) ){
-														var indexData = { };
-														indexData[ "$" + index ] = value;
-														return indexData;		
-													}else{
-														return value;
-													}
-												} );
-											var flattenData = { };
-											_.each( data,
-												function( value ){
-													flattenData = _.extend( flattenData, value );
-												} );
-											data = [ flattenData ];
-										}
-
-										//For handling and normalizing headers.
-										_.each( data,
-											function( row, index ){
-												var columns = _.keys( row );
-												
-												var filteredColumns = _.chain( columns )
-													.without( "$reference", "toString" )
-													.map( function( column ){
-														return column.replace( "$", ":" );
-													} )
-													.value( );
-
-												//If there are no columns yet.
-												if( _.isEmpty( scope.header ) ){
-													scope.header = filteredColumns
-												}
-
-												//If the columns change.
-												columns = _.difference( filteredColumns, scope.header );
-												if( !_.isEmpty( columns ) ){
-													scope.header = scope.header.concat( columns ); 
-												}
-											} );
-
-										//Change after header changes.
-										$timeout( function( ){
-											//Measure data density here.
-											if( !scope.columns ){
-												scope.columns = 10;
-											}
-											var currentColumnCount = scope.header.length;
-											var levelRatio = scope.level / scope.columns;
-											var dataDensity = levelRatio * currentColumnCount;
-											var columnCount = currentColumnCount - Math.ceil( dataDensity );
-											columnCount = columnCount + ( columnCount * levelRatio );
-											scope.dataDensity = dataDensity;
-											if( columnCount >= scope.columns ){
-												//Transform to list
-												viewType = "list";
-												if( "reference" in scope ){
-													scope.$emit( "set-view-type", scope.reference, viewType );	
-												}
-
-												scope.header = [ "key", "value" ];
-												if( data.length == 1 ){
-													data = data[ 0 ]; 
-													if( data instanceof Array ){
-														scope.header[ 0 ] = "index";		
-													}else{
-														var keys = _.keys( data ).join( "" ).replace( /[\$\:]/, "" );
-														if( ( /^\d+$/ ).test( keys ) ){
-															scope.header[ 0 ] = "index";						 
-														}
-													}
-												}else{
-													scope.header[ 0 ] = "index";
-												}
-												
-												data = _.compact( _.map( data,
-													function( value, key ){
-														if( ( /^\$[-a-zA-Z]+/ ).test( key ) ){
-															return null;
-														}
-
-														if( ( /^\$\d+/ ).test( key ) ){
-															key = key.replace( "$", ":" );
-														}
-
-														if( scope.header[ 0 ] == "index" 
-															&& ( /^\d+$/ ).test( key ) )
-														{
-															key = ":" + key;
-														}
-
-														var thisData = { 
-															"value": value
-														};
-
-														thisData[ scope.header[ 0 ] ] = key;
-
-														return thisData;
-													} ) );
-											}
-
-											var body = scope.body;
-											if( scope.view ){
-												body = scope.preBody = [ ];
-											}
-
-											var views = [ ];
-											_.each( data,
-												function( row, index ){
-													//Push data to the right visible columns.
-													body.push( _.without( _.map( scope.header,
-														function( column ){
-															var rowData;
-															if( typeof row[ column ] != "boolean"
-																&& row[ column ] !== 0 )
-															{
-																if( ( /^\:/ ).test( column ) ){
-																	column = column.replace( ":", "$" );
-																}
-
-																rowData = row[ column ] || "";
-
-																//If this is an object then throw it to views.
-																if( typeof rowData == "object" ){
-																	rowData.$reference = Date.now( ) 
-																		+ Math.round( Math.random( ) * Date.now( ) );
-																	views.push( rowData );
-
-																	Object.defineProperty( rowData, "toString",
-																		{
-																			"enumerable": false,
-																			"configurable": true,
-																			"writable": true,
-																			"value": function toString( ){
-																				return rowData.constructor.name;
-																			}
-																		} ); 
-																}
-															}else{
-																rowData = row[ column ];
-															}
-
-															return rowData
-														} ), null ) );
-												} );
-
-											$timeout( function( ){
-												if( !scope.view ){
-													scope.$emit( "set-body", scope.reference );	
-													//We put it here so that after assigning parent reference to views
-													//	this will not break things.
-													scope.views = views;
-												}else{
-													scope.preViews = views;
-												}
-											}, 0 );		
-										}, 0 );	
-									}
-								} );
-						}
-					};
-				} ); 
-
-			adaptTable.directive( "adaptView",
-				function( $timeout, $compile ){
-					return {
-						"require": "?^",
-						"controller": "AdaptTableController",
-						"restrict": "E",
-						"scope": {
-							"data": "=?",
-							"level": "=?"
-						},
-						"link": function( scope, element ){
-							var reference = scope.data.$reference;
-							var viewType = scope.data.$viewType;
-							scope.reference = reference;
-							scope.viewType = viewType;
-
-							var adaptTableView = $( "<adapt-table></adapt-table>" );
-							adaptTableView.attr( {
-								"data": "data",
-								"view": "true",
-								"reference": reference,
-								"level": scope.level
-							} );
-									
-							var container = $( element );
-							container
-								.attr( "reference", reference )
-								.append( adaptTableView );
-
-							$compile( element.contents( ) )( scope );
-
-							$timeout( function( ){
-								var view = $( "adapt-view[reference='" + reference + "']" );
-								if( view.length == 1 ){
-									view.detach( );
-
-									var headerLength = scope.$parent.header.length;
-									
-									var controllers = $( "<div></div>" )
-										.addClass( "controllers col-md-12" )
-										.attr( "parent-reference", reference );
-
-									var identifier = $( "<div></div>" )
-										.addClass( "identifier" )
-										.attr( "parent-reference", reference );
-
-									var viewTd = $( "<td></td>" )
-										.addClass( "sub-container" )
-										.attr( "colspan", headerLength )
-										.mouseover( function( ){
-											scope.hoverOn( reference );
-										} )
-										.mouseout( function( ){
-											scope.hoverOff( reference );
-										} )
-										.append( controllers )
-										.append( identifier )
-										.append( view );
-
-									var viewTr = $( "<tr></tr>" )
-										.append( viewTd )
-										.hide( );
-
-									var dividerTrTop = $( "<tr></tr>" )
-										.addClass( "divider" )
-										.attr( "parent-reference", reference )
-										.hide( );
-
-									var dividerTrBottom = $( "<tr></tr>" )
-										.addClass( "divider" )
-										.attr( "parent-reference", reference )
-										.hide( );
-
-									var spacerTr = $( "<tr></tr>" )
-										.addClass( "spacer" )
-										.attr( "parent-reference", reference )
-										.hide( );
-
-									$( "td[reference='" + reference + "']" )
-										.parent( )
-										.after( spacerTr )
-										.after( dividerTrBottom )
-										.after( viewTr );
-
-									viewTr.before( dividerTrTop );
-								}
-							}, 0 );
-						}
-					}
-				} );
-		</script>
-	</head>
-	<body ng-app="adaptable">
-		<div>
-		</div>
-		<div class="container">
-			<adapt-table>
-			</adapt-table>
-		</div>
-	</body>
+            
+            var adaptTable = angular.module( "adaptable", [ ] );
+            adaptTable.constant( "dummyData", data );
+            adaptTable.controller( "AdaptTableController",
+                function( $scope, $timeout, $compile ){
+
+                    $scope.activateControllers = function activateControllers( reference, viewType ){
+                        if( $scope.controllerReference != reference ){
+                            $scope.$emit( "pass-controllers", reference );
+                            $scope.$broadcast( "pass-controllers", reference );
+                            $scope.$broadcast( "disable-view-type", reference, viewType );
+
+                            //Transfer when controls are activated.
+                            $scope.$broadcast( "transfer-view-set", reference );
+                            $scope.$broadcast( "close-view", reference, viewType, true );
+                        }else{
+                            $scope.$emit( "clear-controllers", reference );
+                            $scope.$broadcast( "clear-controllers", reference );
+                        }
+                    };
+
+                    $scope.activateOverview = function activateOverview( reference ){
+                        if( $scope.overviewReference != reference ){
+
+                        }else{
+
+                        }
+                    };
+
+                    $scope.hoverOn = function hoverOn( reference ){
+                        $scope.$emit( "hover-on", reference || $scope.reference );
+                    };
+
+                    $scope.hoverOff = function hoverOff( reference ){
+                        $scope.$emit( "hover-off", reference || $scope.reference );
+                    };
+
+                    $scope.clickView = function clickView( reference, viewType ){
+                        var parentViewType = viewType;
+                        var parentReference = reference;
+
+                        var view;
+                        if( parentReference in $scope.viewCache ){
+                            view = $scope.viewCache[ parentReference ];
+                        }else{
+                            $scope.$broadcast( "set-body", parentReference );
+
+                            $timeout( function( ){
+                                view = $( "adapt-view[reference='" + parentReference + "']" );
+                                var aTable = $( "> adapt-table", view );    
+                                $scope.viewCache[ parentReference ] = {
+                                    "self": view,
+                                    "aTable": aTable,
+                                    "parent": $( "td[reference='" + parentReference + "']" ),
+                                    "container": aTable.parents( "tr[parent-reference='" + parentReference + "']" ),
+                                    "subContainer": aTable.parents( "td[parent-reference='" + parentReference + "']" ),
+                                    "divider": $( "tr.divider[parent-reference='" + parentReference + "']" ),
+                                    "spacer": $( "tr.spacer[parent-reference='" + parentReference + "']" ),
+                                    "identifier": $( "div.identifier[parent-reference='" + parentReference + "']" ),
+                                    "controllers": $( "div.controllers[parent-reference='" + parentReference + "']" ),
+                                    "overview": $( "div.overview[parent-reference='" + parentReference + "']" )
+                                }
+                                view = $scope.viewCache[ parentReference ];
+
+                                $scope.$on( "transfer-view-set",
+                                    function( event, reference ){
+                                        //When the user activate the controllers, put the entire view set near that row.
+
+                                        //Get the view in the cache.
+                                        var view;
+                                        if( reference in $scope.viewCache ){
+                                            view = $scope.viewCache[ reference ];
+                                        }else{
+                                            //If this is possible then this is fatal. Do nothing.
+                                            return;
+                                        }
+
+                                        //Put the view set near the parent.
+                                        if( "viewSet" in view ){
+                                            view.parent.parent( "tr" ).after( view.viewSet.detach( ) );
+                                        }else{
+                                            /*
+                                                The view set includes all the tr directly below the tbody near the parent
+                                                    that has the same parent reference as of the reference of the parent.
+                                                Remember that td that activates it is the parent reference of the view set.
+                                            */
+                                            var viewContainer = view.parent.parents( "tbody" );
+                                            var viewSet = $( "> tr[parent-reference='" + reference + "']", viewContainer ).detach( );
+                                            view.parent.parent( "tr" ).after( viewSet );
+                                            view.viewSet = viewSet; 
+                                        }
+                                    } );
+
+                                $scope.$on( "adjust-dividers",
+                                    function( ){
+                                        view.identifier.css( "height", view.self.height( ) );
+                                    } );
+
+                                $scope.$on( "hover-on",
+                                    function( event, reference ){
+                                        if( !view.aTable.hasClass( "viewable" ) ){
+                                            if( view.identifier.attr( "parent-reference" ) == reference ){
+                                                view.parent.addClass( "parent-view-hover" );
+                                            }
+                                            return;
+                                        }
+                                        if( view.identifier.attr( "parent-reference" ) == reference ){
+                                            view.identifier.css( "visibility", "visible" );
+                                            view.parent.addClass( "parent-view-hover" );
+                                        }
+                                    } );
+
+                                $scope.$on( "hover-off",
+                                    function( event, reference ){
+                                        if( !view.aTable.hasClass( "viewable" ) ){
+                                            if( view.identifier.attr( "parent-reference" ) == reference ){
+                                                view.parent.removeClass( "parent-view-hover" );
+                                            }
+                                            return;
+                                        }
+                                        if( view.identifier.attr( "parent-reference" ) == reference ){
+                                            view.identifier.css( "visibility", "hidden" );
+                                            view.parent.removeClass( "parent-view-hover" );
+                                        }
+                                    } );
+
+                                $scope.$on( "pass-controllers",
+                                    function( event, reference ){
+                                        $( ".controllers-active" ).removeClass( "controllers-active" );
+                                        $scope.controllerReference = reference;
+                                        $timeout( function( ){
+                                            if( view.controllers.attr( "parent-reference" ) == reference ){
+                                                view.controllers.addClass( "controllers-active" );
+                                                if( !view.controllers.find( "view-controllers" ).length ){
+                                                    var viewControllers = $( "<view-controllers></view-controllers>" );
+                                                    viewControllers.attr( {
+                                                        "reference": reference,
+                                                        "data": "data",
+                                                        "view-type": viewType
+                                                    } );
+                                                    view.controllers.append( viewControllers );
+                                                    $compile( view.controllers.children( )[ 0 ] )( $scope );
+                                                }
+                                                $timeout( function( ){
+                                                    $scope.$emit( "adjust-dividers" );
+                                                }, 0 );
+                                            }
+                                        }, 0 );
+                                    } );
+
+                                $scope.$on( "clear-controllers",
+                                    function( event, reference ){
+                                        $scope.controllerReference = null;
+                                        if( view.controllers.attr( "parent-reference" ) == reference ){
+                                            view.controllers.removeClass( "controllers-active" );
+                                            $timeout( function( ){
+                                                $scope.$emit( "adjust-dividers" );
+                                            }, 0 );
+                                        }
+                                        var activeControllers = $( "adapt-view[reference='" + reference + "']" )
+                                            .find( ".controllers-active" );
+                                        if( activeControllers.length ){
+                                            activeControllers.removeClass( "controllers-active" );
+                                        }
+                                    } );
+
+                                $scope.$on( "pass-overview",
+                                    function( event, reference ){
+
+                                    } );
+
+                                $scope.$on( "clear-overview",
+                                    function( event, reference ){
+
+                                    } );
+
+                                $scope.$on( "close-view",
+                                    function( event, reference, viewType, closeChildrens ){
+                                        if( parentReference != reference ){
+                                            //We invert things because we are traversing the child and every child claims
+                                            //  to be the parent so the reference will be the parent and the parentReference is the child.
+                                            //What we want to check here if the child reference is a valid child of the parent reference.
+                                            if( !( $( "*[parent-reference='" + reference + "']" )
+                                                .find( "*[parent-reference='" + parentReference + "']" ).length ) )
+                                            {
+                                                return;
+                                            }
+                                        }
+
+                                        //This will force to close only all childrens.
+                                        if( closeChildrens
+                                            && parentReference == reference )
+                                        {
+                                            return;
+                                        }
+
+                                        $timeout( function( ){
+                                            $scope.$emit( "adjust-dividers" );
+                                        }, 0 );
+
+                                        view.aTable.removeClass( "viewable" );
+                                        view.aTable.hide( );
+
+                                        var iconTypeCollapse = "glyphicon-th-large";
+                                        var iconTypeExpand = "glyphicon-th";
+                                        switch( viewType ){
+                                            case "map":
+                                                iconTypeCollapse = "glyphicon-move";
+                                                iconTypeExpand = "glyphicon-fullscreen";
+                                                break;
+
+                                            case "list":
+                                                iconTypeCollapse = "glyphicon-th-list";
+                                                iconTypeExpand = "glyphicon-list";
+                                                break;
+                                        }
+                                        
+                                        //There should only be one of this.
+                                        view.parent.removeClass( "parent-view-select" );
+                                        view.parent.find( "i.view-type" )
+                                            .removeClass( iconTypeExpand )
+                                            .addClass( iconTypeCollapse );
+                                        
+                                        view.subContainer
+                                            .removeClass( "view-select" )
+                                            .removeClass( "view-expand" );
+                                        
+                                        view.container
+                                            .removeClass( "view-select" )
+                                            .hide( );
+
+                                        view.divider.hide( );
+                                        view.spacer.hide( );
+
+                                        $scope.$emit( "clear-controllers", reference );
+                                        $scope.$broadcast( "clear-controllers", reference );
+                                    } );
+
+                                $scope.$on( "click-view",
+                                    function( event, reference, viewType ){
+                                        if( parentReference != reference ){
+                                            return;
+                                        }
+
+                                        if( view.aTable.hasClass( "viewable" ) ){
+                                            $scope.$broadcast( "close-view", reference, viewType );
+                                            return;
+                                        }
+
+                                        $timeout( function( ){
+                                            $scope.$emit( "adjust-dividers" );
+                                        }, 0 );
+
+                                        var iconTypeCollapse = "glyphicon-th-large";
+                                        var iconTypeExpand = "glyphicon-th";
+                                        switch( viewType ){
+                                            case "map":
+                                                iconTypeCollapse = "glyphicon-move";
+                                                iconTypeExpand = "glyphicon-fullscreen";
+                                                break;
+
+                                            case "list":
+                                                iconTypeCollapse = "glyphicon-th-list";
+                                                iconTypeExpand = "glyphicon-list";
+                                                break;
+                                        }
+
+                                        view.aTable.addClass( "viewable" );
+                                        view.aTable.show( );
+                                        
+                                        //There should only be one of this.
+                                        view.parent.addClass( "parent-view-select" );
+                                        view.parent.find( "i.view-type" )
+                                            .addClass( iconTypeExpand )
+                                            .removeClass( iconTypeCollapse );
+
+                                        view.subContainer
+                                            .addClass( "view-select" )
+                                            .addClass( "view-expand" );
+                                        
+                                        view.container
+                                            .addClass( "view-select" )
+                                            .show( );
+
+                                        view.divider.show( );
+                                        view.spacer.show( );
+
+                                        //Transfer on expanded view set.
+                                        $scope.$broadcast( "transfer-view-set", reference );
+                                    } );
+
+                                $scope.$emit( "click-view", parentReference, parentViewType );
+                            }, 0 );
+
+                            return;
+                        }
+
+                        $scope.$emit( "click-view", parentReference, parentViewType );
+                    };
+                } );
+
+            adaptTable.directive( "overviewPane",
+                function( $timeout, $compile ){
+                    return {
+                        "require": "?^",
+                        "restrict": "E",
+                        "controller": "AdaptTableController",
+                        "scope": {
+                            "reference": "=?",
+                            "data": "=?"
+                        },
+                        "template":
+                            "<ol class=\"breadcrumb\">" + 
+                                "<li ng-repeat=\"ancestry in ancestryList\" " +
+                                    "class=\"ancestry\">" +
+                                    "<span ng-bind=\"ancestry\"></span>" + 
+                                "</li>" +
+                                "<li ng-repeat=\"info in infoList\" " +
+                                    "class=\"info\">" +
+                                    "<span ng-bind=\"\"></span>" +
+                                "</li>" +
+                            "</ol>",
+                        "link": function( scope, element ){
+                            var ancestors = scope.data.$columnAncestry.split( /\b(?=\.|\:)/ );
+                            scope.ancestryList = _.compact( _.map( ancestors,
+                                function( ancestor ){
+                                    if( ( /^[\:]/ ).test( ancestor ) ){
+                                        return "index: " + ancestor.replace( ":", "" );
+                                    }else if( ( /^[\:]/ ).test( ancestor ) ){
+                                        return ancestor.replace( ".", "" );
+                                    }else if( ancestor ){
+                                        return ancestor;
+                                    }
+                                } ) );
+                        }
+                    };
+                } );
+
+            adaptTable.directive( "viewControllers",
+                function( $timeout, $compile ){
+                    return {
+                        "require": "?^",
+                        "restrict": "E",
+                        "controller": "AdaptTableController",
+                        "scope": {
+                            "reference": "=?",
+                            "data": "=?",
+                            "viewType": "@?"
+                        },
+                        "template":
+                            "<button class=\"view-table btn\">" +
+                                "<i class=\"glyphicon glyphicon-th-large\"></i>" +
+                                "<span>View as table.</span>" +
+                            "</button>" +
+                            "<button class=\"view-list btn\">" +
+                                "<i class=\"glyphicon glyphicon-th-list\"></i>" +
+                                "<span>View as list.</span>" +
+                            "</button>" +
+                            "<button class=\"view-map btn\">" +
+                                "<i class=\"glyphicon glyphicon-move\"></i>" +
+                                "<span>View as map.</span>" +
+                            "</button>" +
+                            "<button class=\"view-map btn\">" +
+                                "<i class=\"glyphicon glyphicon-filter\"></i>" +
+                                "<span>View filters.</span>" +
+                            "</button>" + 
+                            "<button class=\"view-overview btn\">" +
+                                "<i class=\"glyphicon glyphicon-info-sign\"></i>" +
+                                "<span>View overviews.</span>" +
+                            "</button>",
+                        "link": function( scope, element ){
+                            var container = $( element );
+
+                            var reference = scope.reference;
+                            var currentViewType = scope.viewType;
+
+                            container
+                                .mouseover( function( ){
+                                    scope.hoverOn( reference );
+                                } )
+                                .mouseout( function( ){
+                                    scope.hoverOff( reference );
+                                } );
+
+                            scope.$on( "disable-view-type",
+                                function( event, reference, viewType ){
+                                    if( scope.reference == reference ){
+                                        container.find( ".view-" + viewType ).prop( "disabled", true );
+                                        scope.viewType = viewType;
+                                    }
+                                } );
+
+                            //Emit on first.
+                            scope.$emit( "disable-view-type", reference, currentViewType );
+
+                            container
+                                .find( "button" )
+                                .mouseover( function( ){
+                                    $( this ).addClass( "btn-primary" );
+                                } )
+                                .mouseout( function( ){
+                                    $( this ).removeClass( "btn-primary" );
+                                } );
+                        }
+                    };
+                } );
+
+            adaptTable.directive( "viewOverviews",
+                function( $timeout, $compile ){
+                    return {
+                        "require": "?^",
+                        "restrict": "E",
+                        "controller": "AdaptTableController",
+                        "scope": {
+                            "reference": "=?",
+                            "data": "=?",
+                        },
+                        "template": "",
+                        "link": function( scope, element ){
+                            var container = $( element );
+
+                            var reference = scope.reference;
+                            
+                        }
+                    };
+                } );
+
+            
+
+            adaptTable.directive( "adaptTable",
+                function( dummyData, $timeout, $compile ){
+                    return {
+                        "require": "?^",
+                        "restrict": "E",
+                        "controller": "AdaptTableController",
+                        "template": "<div class=\"table-container col-xs-12 col-sm-12 col-md-12\">" +
+                                        "<table class=\"col-xs-12 col-sm-12 col-md-12 table table-hover table-bordered table-striped\">" +
+                                            "<thead>" +
+                                                "<tr>" +
+                                                    "<th ng-repeat=\"column in header track by $index\"" +
+                                                        "column=\"{{ column }}\">" +
+                                                        "<span ng-bind=\"column\"></span>" +
+                                                    "</th>" +
+                                                "</tr>" +
+                                            "</thead>" +
+                                            "<tbody>" +
+                                                "<tr ng-repeat=\"row in body track by $index\">" +
+                                                    "<td ng-repeat=\"cell in row track by $index\" " +
+                                                        "reference=\"{{ cell.$reference }}\" " + 
+                                                        "ng-mouseover=\"hoverOn( cell.$reference )\" " +
+                                                        "ng-mouseleave=\"hoverOff( cell.$reference )\" " +
+                                                        "ng-click=\"clickView( cell.$reference, viewTypeList[ cell.$reference ] )\">" +
+                                                        
+                                                        "<i class=\"view-type glyphicon glyphicon-th-large\" "
+                                                            + "ng-if=\"cell.$reference && viewTypeList[ cell.$reference ] == 'table'\"></i>" +
+                                                        "<i class=\"view-type glyphicon glyphicon-th-list\" "
+                                                            + "ng-if=\"cell.$reference && viewTypeList[ cell.$reference ] == 'list'\"></i>" +
+                                                        "<i class=\"view-type glyphicon glyphicon-move\" "
+                                                            + "ng-if=\"cell.$reference && viewTypeList[ cell.$reference ] == 'map'\"></i>" +
+                                                        "<i class=\"view-controls glyphicon glyphicon-cog button-controller\" " +
+                                                            "ng-show=\"controllerReference == cell.$reference\" " +
+                                                            "ng-click=\"activateControllers( cell.$reference, viewTypeList[ cell.$reference ] );"
+                                                                + " $event.stopPropagation( );\" " +
+                                                            "ng-if=\"cell.$reference\"></i>" +
+                                                        
+                                                        "<span ng-bind=\"cell\"></span>" +
+                                                    "</td>" +
+                                                "</tr>" +
+                                                "<adapt-view "+
+                                                    "class=\"col-md-12\" " +
+                                                    "ng-repeat=\"view in views track by $index\" " +
+                                                    "ng-mouseover=\"hoverOn( )\" " +
+                                                    "ng-mouseleave=\"hoverOff( )\" " +
+                                                    "level=\"( level + 1 )\" " +
+                                                    "view-type=\"viewType\" " + 
+                                                    "data=\"view\">" +
+                                                "</adapt-view>" +
+                                            "</tbody>" +
+                                            "<tfoot>" +
+                                                "<tr>" +
+                                                    "<th ng-repeat=\"column in header track by $index\"" +
+                                                        "column=\"{{ column }}\">" +
+                                                        "<span ng-bind=\"column\"></span>" +
+                                                    "</th>" +
+                                                "</tr>" +
+                                            "</tfoot>" +
+                                        "</table>" +
+                                    "</div>",
+                        "scope": {
+                            "data": "=?",
+                            "view": "=?",
+                            "reference": "=?",
+                            "level": "=?",
+                            "columns": "=?",
+                            "columnAncestry": "@?"
+                        },
+                        "link": function( scope, element ){
+                            var container = $( element );
+
+                            if( scope.view ){
+                                container.hide( );
+                            }
+
+                            if( !scope.level ){
+                                scope.level = 1;
+                            }
+                            
+                            //This will only auto complete or reduce the row elements.
+                            scope.$watch( "header",
+                                function(  newValue ){
+                                    if( newValue !== undefined ){
+                                        if( !_.isEmpty( scope.body ) ){
+                                            _.each( scope.body,
+                                                function( row, index ){
+                                                    var excess = newValue.length - row.length;
+                                                    if( newValue.length > row.length ){
+                                                        //Apply padding.
+                                                        var dummyArray = ( new Array( excess ) ).join( "," ).split( "," );
+                                                        var paddedArray = scope.body[ index ].concat( dummyArray );
+                                                        scope.body[ index ] = paddedArray;
+                                                    }else{
+                                                        //Reduce the array.
+                                                        scope.body[ index ].splice( -1, excess )
+                                                    }
+                                                } );
+                                        }
+                                    }
+                                } );
+
+                            //Watch for any changes in the views.
+                            //Changes will be pushed back to the original data.
+                            scope.$watch( "views",
+                                function( newValue ){
+                                    if( newValue !== undefined ){
+
+                                    }
+                                } );
+
+                            scope.$on( "set-view-type",
+                                function( event, reference, viewType ){
+                                    if( "viewTypeList" in scope ){
+                                        scope.viewTypeList[ reference ] = viewType;
+                                    }
+                                } );
+
+                            scope.$on( "set-body",
+                                function( event, reference ){
+                                    if( scope.reference == reference ){
+                                        if( scope.view ){
+                                            scope.body = scope.preBody; 
+                                        }
+                                        
+                                        $timeout( function( ){
+                                            //If this is a view assign a parent reference.
+                                            if( scope.view ){
+                                                container
+                                                    .parents( "td, tr" )
+                                                    .each( function( ){
+                                                        if( !$( this ).attr( "parent-reference" ) ){
+                                                            $( this ).attr( "parent-reference", scope.reference );  
+                                                        }
+                                                    } );
+                                                container
+                                                    .find( "table, thead, tbody, tfoot, tr, th, td" )
+                                                    .each( function( ){
+                                                        if( !$( this ).attr( "parent-reference" ) ){
+                                                            $( this ).attr( "parent-reference", scope.reference );  
+                                                        }
+                                                    } );
+
+                                                scope.views = scope.preViews;
+                                            }
+
+                                            //Preformatting for array indices.
+                                            $( "td > span:contains(':'), th > span:contains(':')" )
+                                                .each( function( ){
+                                                    var span = $( this );
+                                                    var contents = span.html( );
+                                                    var index = contents.match( /\d+/ );
+                                                    contents = contents.replace( /^\:/, "<i class=\"glyphicon glyphicon-align-justify\"></i>" );
+                                                    span.html( contents );
+                                                    span.attr( "title", "Index: " + index );
+                                                    $( "> i", span ).attr( "title", "Index: " + index );
+                                                } );
+                                        }, 0 );
+                                    }
+                                } );
+
+                            //This is for testing purposes only.
+                            if( _.isEmpty( scope.data ) && !scope.view ){
+                                scope.data = dummyData;
+                            }       
+
+                            scope.$watch( "data",
+                                function( newValue ){
+                                    if( newValue !== undefined ){
+                                        scope.header = [ ];
+                                        scope.body = [ ];
+                                        scope.views = [ ];
+                                        scope.viewTypeList = { };
+                                        scope.viewCache = { };
+
+                                        //Easiest way to clone the data.
+                                        var data = JSON.parse( JSON.stringify( scope.data ) );
+
+                                        if( !( data instanceof Array ) ){
+                                            data = [ data ];
+                                        }
+
+                                        //Mark this as default table view.
+                                        var viewType = "table";
+                                        if( "reference" in scope ){
+                                            scope.$emit( "set-view-type", scope.reference, viewType );  
+                                        }
+
+                                        //For handling irregular arrays.
+                                        var isIrregularArray = false;
+                                        data = _.map( data,
+                                            function( value, index ){
+                                                if( value instanceof Array 
+                                                    || typeof value != "object" )
+                                                {
+                                                    isIrregularArray = true;
+                                                    var indexData = { };
+                                                    indexData[ "$" + index ] = value;
+                                                    return indexData;
+                                                }else{
+                                                    return value;
+                                                }
+                                            } );
+
+                                        //For normalizing irregular arrays.
+                                        //This will flatten things.
+                                        if( isIrregularArray ){
+                                            data = _.map( data,
+                                                function( value, index ){
+                                                    if( !( /^\$/ ).test( _.keys( value )[ 0 ] ) ){
+                                                        var indexData = { };
+                                                        indexData[ "$" + index ] = value;
+                                                        return indexData;       
+                                                    }else{
+                                                        return value;
+                                                    }
+                                                } );
+                                            var flattenData = { };
+                                            _.each( data,
+                                                function( value ){
+                                                    flattenData = _.extend( flattenData, value );
+                                                } );
+                                            data = [ flattenData ];
+                                        }
+
+                                        //For handling and normalizing headers.
+                                        _.each( data,
+                                            function( row, index ){
+                                                var columns = _.keys( row );
+                                                
+                                                var filteredColumns = _.chain( columns )
+                                                    .without( "$columnAncestry", 
+                                                        "$reference", 
+                                                        "toString" )
+                                                    .map( function( column ){
+                                                        return column.replace( "$", ":" );
+                                                    } )
+                                                    .value( );
+
+                                                //If there are no columns yet.
+                                                if( _.isEmpty( scope.header ) ){
+                                                    scope.header = filteredColumns
+                                                }
+
+                                                //If the columns change.
+                                                columns = _.difference( filteredColumns, scope.header );
+                                                if( !_.isEmpty( columns ) ){
+                                                    scope.header = scope.header.concat( columns ); 
+                                                }
+                                            } );
+
+                                        //Change after header changes.
+                                        $timeout( function( ){
+                                            //Measure data density here.
+                                            if( !scope.columns ){
+                                                scope.columns = 10;
+                                            }
+                                            var currentColumnCount = scope.header.length;
+                                            var levelRatio = scope.level / scope.columns;
+                                            var dataDensity = levelRatio * currentColumnCount;
+                                            var columnCount = currentColumnCount - Math.ceil( dataDensity );
+                                            columnCount = columnCount + ( columnCount * levelRatio );
+                                            scope.dataDensity = dataDensity;
+                                            if( columnCount >= scope.columns ){
+                                                //Transform to list
+                                                viewType = "list";
+                                                if( "reference" in scope ){
+                                                    scope.$emit( "set-view-type", scope.reference, viewType );  
+                                                }
+
+                                                scope.header = [ "key", "value" ];
+                                                if( data.length == 1 ){
+                                                    data = data[ 0 ]; 
+                                                    if( data instanceof Array ){
+                                                        scope.header[ 0 ] = "index";        
+                                                    }else{
+                                                        var keys = _.keys( data ).join( "" ).replace( /[\$\:]/, "" );
+                                                        if( ( /^\d+$/ ).test( keys ) ){
+                                                            scope.header[ 0 ] = "index";                         
+                                                        }
+                                                    }
+                                                }else{
+                                                    scope.header[ 0 ] = "index";
+                                                }
+                                                
+                                                data = _.compact( _.map( data,
+                                                    function( value, key ){
+                                                        if( ( /^\$[-a-zA-Z]+/ ).test( key ) ){
+                                                            return null;
+                                                        }
+
+                                                        if( ( /^\$\d+/ ).test( key ) ){
+                                                            key = key.replace( "$", ":" );
+                                                        }
+
+                                                        if( scope.header[ 0 ] == "index" 
+                                                            && ( /^\d+$/ ).test( key ) )
+                                                        {
+                                                            key = ":" + key;
+                                                        }
+
+                                                        var thisData = { 
+                                                            "value": value
+                                                        };
+
+                                                        thisData[ scope.header[ 0 ] ] = key;
+
+                                                        return thisData;
+                                                    } ) );
+                                            }
+
+                                            var body = scope.body;
+                                            if( scope.view ){
+                                                body = scope.preBody = [ ];
+                                            }
+
+                                            var views = [ ];
+                                            _.each( data,
+                                                function( row, index ){
+                                                    //Push data to the right visible columns.
+                                                    body.push( _.without( _.map( scope.header,
+                                                        function( column ){
+                                                            var rowData;
+                                                            if( typeof row[ column ] != "boolean"
+                                                                && row[ column ] !== 0 )
+                                                            {
+                                                                if( ( /^\:/ ).test( column ) ){
+                                                                    column = column.replace( ":", "$" );
+                                                                }
+
+                                                                rowData = row[ column ] || "";
+
+                                                                //If this is an object then throw it to views.
+                                                                if( typeof rowData == "object" ){
+                                                                    rowData.$reference = Date.now( ) 
+                                                                        + Math.round( Math.random( ) * Date.now( ) );
+                                                                    var columnAncestry = scope.columnAncestry;
+                                                                    var realColumn = "." + column;
+                                                                    if( viewType == "list" ){
+                                                                        var location;
+                                                                        if( location = row[ "key" ] ){
+                                                                            realColumn = "." + location;
+                                                                        }else if( location = row[ "index" ] ){
+                                                                            realColumn = location;
+                                                                        }
+                                                                    }
+                                                                    if( !columnAncestry ){
+                                                                        rowData.$columnAncestry = realColumn.replace( ".", "" );
+                                                                    }else{
+                                                                        rowData.$columnAncestry = columnAncestry + realColumn;
+                                                                    }
+
+                                                                    views.push( rowData );
+
+                                                                    Object.defineProperty( rowData, "toString",
+                                                                        {
+                                                                            "enumerable": false,
+                                                                            "configurable": true,
+                                                                            "writable": true,
+                                                                            "value": function toString( ){
+                                                                                return rowData.constructor.name;
+                                                                            }
+                                                                        } ); 
+                                                                }
+                                                            }else{
+                                                                rowData = row[ column ];
+                                                            }
+
+                                                            return rowData
+                                                        } ), null ) );
+                                                } );
+
+                                            $timeout( function( ){
+                                                if( !scope.view ){
+                                                    scope.$emit( "set-body", scope.reference ); 
+                                                    //We put it here so that after assigning parent reference to views
+                                                    //  this will not break things.
+                                                    scope.views = views;
+                                                }else{
+                                                    scope.preViews = views;
+                                                }
+                                            }, 0 );     
+                                        }, 0 ); 
+                                    }
+                                } );
+                        }
+                    };
+                } ); 
+
+            adaptTable.directive( "adaptView",
+                function( $timeout, $compile ){
+                    return {
+                        "require": "?^",
+                        "controller": "AdaptTableController",
+                        "restrict": "E",
+                        "scope": {
+                            "data": "=?",
+                            "level": "=?"
+                        },
+                        "link": function( scope, element ){
+                            var reference = scope.data.$reference;
+                            var viewType = scope.data.$viewType;
+                            var columnAncestry = scope.data.$columnAncestry;
+                            scope.reference = reference;
+                            scope.viewType = viewType;
+                            scope.columnAncestry = columnAncestry;
+
+                            var adaptTableView = $( "<adapt-table></adapt-table>" );
+                            adaptTableView.attr( {
+                                "data": "data",
+                                "view": "true",
+                                "reference": reference,
+                                "level": scope.level,
+                                "column-ancestry": columnAncestry
+                            } );
+                                    
+                            var container = $( element );
+                            container
+                                .attr( "reference", reference )
+                                .append( adaptTableView );
+
+                            $compile( element.contents( ) )( scope );
+
+                            $timeout( function( ){
+                                var view = $( "adapt-view[reference='" + reference + "']" );
+                                if( view.length == 1 ){
+                                    view.detach( );
+
+                                    var headerLength = scope.$parent.header.length;
+                                    
+                                    var controllers = $( "<div></div>" )
+                                        .addClass( "controllers col-md-12" )
+                                        .attr( "parent-reference", reference );
+
+                                    var overview = $( "<div></div>" )
+                                        .addClass( "overview col-md-12" )
+                                        .attr( "parent-reference", reference );
+
+                                    var identifier = $( "<div></div>" )
+                                        .addClass( "identifier" )
+                                        .attr( "parent-reference", reference );
+
+                                    var viewTd = $( "<td></td>" )
+                                        .addClass( "sub-container" )
+                                        .attr( "colspan", headerLength )
+                                        .mouseover( function( ){
+                                            scope.hoverOn( reference );
+                                        } )
+                                        .mouseout( function( ){
+                                            scope.hoverOff( reference );
+                                        } )
+                                        .append( controllers )
+                                        //.append( overview )
+                                        .append( identifier )
+                                        .append( view );
+
+                                    var viewTr = $( "<tr></tr>" )
+                                        .append( viewTd )
+                                        .hide( );
+
+                                    var dividerTrTop = $( "<tr></tr>" )
+                                        .addClass( "divider" )
+                                        .attr( "parent-reference", reference )
+                                        .hide( );
+
+                                    var dividerTrBottom = $( "<tr></tr>" )
+                                        .addClass( "divider" )
+                                        .attr( "parent-reference", reference )
+                                        .hide( );
+
+                                    var spacerTr = $( "<tr></tr>" )
+                                        .addClass( "spacer" )
+                                        .attr( "parent-reference", reference )
+                                        .hide( );
+
+                                    $( "td[reference='" + reference + "']" )
+                                        .parent( )
+                                        .after( spacerTr )
+                                        .after( dividerTrBottom )
+                                        .after( viewTr );
+
+                                    viewTr.before( dividerTrTop );
+                                }
+                            }, 0 );
+                        }
+                    }
+                } );
+        </script>
+    </head>
+    <body ng-app="adaptable">
+        <div>
+        </div>
+        <div class="container">
+            <adapt-table>
+            </adapt-table>
+        </div>
+    </body>
 </html>

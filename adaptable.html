@@ -131,6 +131,17 @@
 				border: 1px solid #e0e0e0 !important;
 				margin-bottom: 1px !important;
 				padding: 2px !important;
+				display: none;
+			}
+
+			adapt-table > div.table-container > table > tbody > tr > 
+				td div.overview-active {
+				display: block;
+			}
+
+			adapt-table > div.table-container > table > tbody > tr > 
+				td div.overview-active > overview-pane {
+				display: block;
 			}
 
 			adapt-table > div.table-container > table > tbody > tr > td > 
@@ -174,7 +185,7 @@
 				width: 100% !important;
 			}
 
-			@media screen and (max-width: 600px) {
+			@media screen and (max-width: 800px) {
 				adapt-table > div.table-container > table > tbody > tr > td > 
 					div > view-controllers > button > span {
 					display: none !important;
@@ -369,10 +380,18 @@
 					};
 
 					$scope.activateOverview = function activateOverview( reference ){
+						console.debug( reference );
 						if( $scope.overviewReference != reference ){
+							$scope.$emit( "pass-overview", reference );
+							$scope.$broadcast( "pass-overview", reference );
+							$scope.$broadcast( "disable-view-type", reference, viewType );
 
+							//Transfer when controls are activated.
+							$scope.$broadcast( "transfer-view-set", reference );
+							$scope.$broadcast( "close-view", reference, viewType, true );
 						}else{
-
+							$scope.$emit( "clear-controllers", reference );
+							$scope.$broadcast( "clear-controllers", reference );
 						}
 					};
 
@@ -515,12 +534,42 @@
 
 								$scope.$on( "pass-overview",
 									function( event, reference ){
-
+										$( ".overview-active" ).removeClass( "overview-active" );
+										$scope.overviewReference = reference;
+										$timeout( function( ){
+											if( view.overview.attr( "parent-reference" ) == reference ){
+												view.overview.addClass( "overview-active" );
+												if( !view.overview.find( "overview-pane" ).length ){
+													var overviewPane = $( "<overview-pane></overview-pane>" );
+													overviewPane.attr( {
+														"reference": reference,
+														"data": "data",
+														"column-ancestry": $scope.columnAncestry
+													} );
+													view.overview.append( overviewPane );
+													$compile( view.overview.children( )[ 0 ] )( $scope );
+												}
+												$timeout( function( ){
+													$scope.$emit( "adjust-dividers" );
+												}, 0 );
+											}
+										}, 0 );
 									} );
 
 								$scope.$on( "clear-overview",
 									function( event, reference ){
-
+										$scope.overviewReference = null;
+										if( view.overview.attr( "parent-reference" ) == reference ){
+											view.overview.removeClass( "overview-active" );
+											$timeout( function( ){
+												$scope.$emit( "adjust-dividers" );
+											}, 0 );
+										}
+										var activeOverview = $( "adapt-view[reference='" + reference + "']" )
+											.find( ".overview-active" );
+										if( activeOverview.length ){
+											activeOverview.removeClass( "overview-active" );
+										}
 									} );
 
 								$scope.$on( "close-view",
@@ -671,7 +720,16 @@
 							"</ol>",
 						"link": function( scope, element ){
 							var ancestors = scope.data.$columnAncestry.split( /\b(?=\.|\:)/ );
-							scope.ancestryList = _.map(  )
+							scope.ancestryList = _.compact( _.map( ancestors,
+								function( ancestor ){
+									if( ( /^[\:]/ ).test( ancestor ) ){
+										return "index: " + ancestor.replace( ":", "" );
+									}else if( ( /^[\:]/ ).test( ancestor ) ){
+										return ancestor.replace( ".", "" );
+									}else if( ancestor ){
+										return ancestor;
+									}
+								} ) );
 						}
 					};
 				} );
@@ -704,7 +762,8 @@
 								"<i class=\"glyphicon glyphicon-filter\"></i>" +
 								"<span>View filters.</span>" +
 							"</button>" + 
-							"<button class=\"view-overview btn\">" +
+							"<button class=\"view-overview btn\" " +
+								"ng-click=\"activateOverview(reference);\">" +
 								"<i class=\"glyphicon glyphicon-info-sign\"></i>" +
 								"<span>View overviews.</span>" +
 							"</button>",
