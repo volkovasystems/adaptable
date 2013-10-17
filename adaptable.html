@@ -377,237 +377,245 @@
 						if( parentReference in $scope.viewCache ){
 							view = $scope.viewCache[ parentReference ];
 						}else{
-							view = $( "adapt-view[reference='" + parentReference + "']" );
-							var aTable = $( "> adapt-table", view );	
-							$scope.viewCache[ parentReference ] = {
-								"self": view,
-								"aTable": aTable,
-								"parent": $( "td[reference='" + parentReference + "']" ),
-								"container": aTable.parents( "tr[parent-reference='" + parentReference + "']" ),
-								"subContainer": aTable.parents( "td[parent-reference='" + parentReference + "']" ),
-								"divider": $( "tr.divider[parent-reference='" + parentReference + "']" ),
-								"spacer": $( "tr.spacer[parent-reference='" + parentReference + "']" ),
-								"identifier": $( "div.identifier[parent-reference='" + parentReference + "']" ),
-								"controllers": $( "div.controllers[parent-reference='" + parentReference + "']" )
-							}
-							view = $scope.viewCache[ parentReference ];
+							$scope.$broadcast( "set-body", parentReference );
 
-							$scope.$on( "transfer-view-set",
-								function( event, reference ){
-									//When the user activate the controllers, put the entire view set near that row.
+							$timeout( function( ){
+								view = $( "adapt-view[reference='" + parentReference + "']" );
+								var aTable = $( "> adapt-table", view );	
+								$scope.viewCache[ parentReference ] = {
+									"self": view,
+									"aTable": aTable,
+									"parent": $( "td[reference='" + parentReference + "']" ),
+									"container": aTable.parents( "tr[parent-reference='" + parentReference + "']" ),
+									"subContainer": aTable.parents( "td[parent-reference='" + parentReference + "']" ),
+									"divider": $( "tr.divider[parent-reference='" + parentReference + "']" ),
+									"spacer": $( "tr.spacer[parent-reference='" + parentReference + "']" ),
+									"identifier": $( "div.identifier[parent-reference='" + parentReference + "']" ),
+									"controllers": $( "div.controllers[parent-reference='" + parentReference + "']" )
+								}
+								view = $scope.viewCache[ parentReference ];
 
-									//Get the view in the cache.
-									var view;
-									if( reference in $scope.viewCache ){
-										view = $scope.viewCache[ reference ];
-									}else{
-										//If this is possible then this is fatal. Do nothing.
-										return;
-									}
+								$scope.$on( "transfer-view-set",
+									function( event, reference ){
+										//When the user activate the controllers, put the entire view set near that row.
 
-									//Put the view set near the parent.
-									if( "viewSet" in view ){
-										view.parent.parent( "tr" ).after( view.viewSet.detach( ) );
-									}else{
-										/*
-											The view set includes all the tr directly below the tbody near the parent
-												that has the same parent reference as of the reference of the parent.
-											Remember that td that activates it is the parent reference of the view set.
-										*/
-										var viewContainer = view.parent.parents( "tbody" );
-										var viewSet = $( "> tr[parent-reference='" + reference + "']", viewContainer ).detach( );
-										view.parent.parent( "tr" ).after( viewSet );
-										view.viewSet = viewSet;	
-									}
-								} );
+										//Get the view in the cache.
+										var view;
+										if( reference in $scope.viewCache ){
+											view = $scope.viewCache[ reference ];
+										}else{
+											//If this is possible then this is fatal. Do nothing.
+											return;
+										}
 
-							$scope.$on( "adjust-dividers",
-								function( ){
-									view.identifier.css( "height", view.self.height( ) );
-								} );
+										//Put the view set near the parent.
+										if( "viewSet" in view ){
+											view.parent.parent( "tr" ).after( view.viewSet.detach( ) );
+										}else{
+											/*
+												The view set includes all the tr directly below the tbody near the parent
+													that has the same parent reference as of the reference of the parent.
+												Remember that td that activates it is the parent reference of the view set.
+											*/
+											var viewContainer = view.parent.parents( "tbody" );
+											var viewSet = $( "> tr[parent-reference='" + reference + "']", viewContainer ).detach( );
+											view.parent.parent( "tr" ).after( viewSet );
+											view.viewSet = viewSet;	
+										}
+									} );
 
-							$scope.$on( "hover-on",
-								function( event, reference ){
-									if( !view.aTable.hasClass( "viewable" ) ){
+								$scope.$on( "adjust-dividers",
+									function( ){
+										view.identifier.css( "height", view.self.height( ) );
+									} );
+
+								$scope.$on( "hover-on",
+									function( event, reference ){
+										if( !view.aTable.hasClass( "viewable" ) ){
+											if( view.identifier.attr( "parent-reference" ) == reference ){
+												view.parent.addClass( "parent-view-hover" );
+											}
+											return;
+										}
 										if( view.identifier.attr( "parent-reference" ) == reference ){
+											view.identifier.css( "visibility", "visible" );
 											view.parent.addClass( "parent-view-hover" );
 										}
-										return;
-									}
-									if( view.identifier.attr( "parent-reference" ) == reference ){
-										view.identifier.css( "visibility", "visible" );
-										view.parent.addClass( "parent-view-hover" );
-									}
-								} );
+									} );
 
-							$scope.$on( "hover-off",
-								function( event, reference ){
-									if( !view.aTable.hasClass( "viewable" ) ){
+								$scope.$on( "hover-off",
+									function( event, reference ){
+										if( !view.aTable.hasClass( "viewable" ) ){
+											if( view.identifier.attr( "parent-reference" ) == reference ){
+												view.parent.removeClass( "parent-view-hover" );
+											}
+											return;
+										}
 										if( view.identifier.attr( "parent-reference" ) == reference ){
+											view.identifier.css( "visibility", "hidden" );
 											view.parent.removeClass( "parent-view-hover" );
 										}
-										return;
-									}
-									if( view.identifier.attr( "parent-reference" ) == reference ){
-										view.identifier.css( "visibility", "hidden" );
-										view.parent.removeClass( "parent-view-hover" );
-									}
-								} );
+									} );
 
-							$scope.$on( "pass-controllers",
-								function( event, reference ){
-									$( ".controllers-active" ).removeClass( "controllers-active" );
-									$scope.controllerReference = reference;
-									$timeout( function( ){
-										if( view.controllers.attr( "parent-reference" ) == reference ){
-											view.controllers.addClass( "controllers-active" );
-											if( !view.controllers.find( "view-controllers" ).length ){
-												var viewControllers = $( "<view-controllers></view-controllers>" );
-												viewControllers.attr( {
-													"reference": reference,
-													"data": "data",
-													"view-type": viewType
-												} );
-												view.controllers.append( viewControllers );
-												$compile( view.controllers.children( )[ 0 ] )( $scope );
+								$scope.$on( "pass-controllers",
+									function( event, reference ){
+										$( ".controllers-active" ).removeClass( "controllers-active" );
+										$scope.controllerReference = reference;
+										$timeout( function( ){
+											if( view.controllers.attr( "parent-reference" ) == reference ){
+												view.controllers.addClass( "controllers-active" );
+												if( !view.controllers.find( "view-controllers" ).length ){
+													var viewControllers = $( "<view-controllers></view-controllers>" );
+													viewControllers.attr( {
+														"reference": reference,
+														"data": "data",
+														"view-type": viewType
+													} );
+													view.controllers.append( viewControllers );
+													$compile( view.controllers.children( )[ 0 ] )( $scope );
+												}
+												$timeout( function( ){
+													$scope.$emit( "adjust-dividers" );
+												}, 0 );
 											}
+										}, 0 );
+									} );
+
+								$scope.$on( "clear-controllers",
+									function( event, reference ){
+										$scope.controllerReference = null;
+										if( view.controllers.attr( "parent-reference" ) == reference ){
+											view.controllers.removeClass( "controllers-active" );
 											$timeout( function( ){
 												$scope.$emit( "adjust-dividers" );
 											}, 0 );
 										}
-									}, 0 );
-								} );
+										var activeControllers = $( "adapt-view[reference='" + reference + "']" )
+											.find( ".controllers-active" );
+										if( activeControllers.length ){
+											activeControllers.removeClass( "controllers-active" );
+										}
+									} );
 
-							$scope.$on( "clear-controllers",
-								function( event, reference ){
-									$scope.controllerReference = null;
-									if( view.controllers.attr( "parent-reference" ) == reference ){
-										view.controllers.removeClass( "controllers-active" );
-										$timeout( function( ){
-											$scope.$emit( "adjust-dividers" );
-										}, 0 );
-									}
-									var activeControllers = $( "adapt-view[reference='" + reference + "']" )
-										.find( ".controllers-active" );
-									if( activeControllers.length ){
-										activeControllers.removeClass( "controllers-active" );
-									}
-								} );
+								$scope.$on( "close-view",
+									function( event, reference, viewType, closeChildrens ){
+										if( parentReference != reference ){
+											//We invert things because we are traversing the child and every child claims
+											//	to be the parent so the reference will be the parent and the parentReference is the child.
+											//What we want to check here if the child reference is a valid child of the parent reference.
+											if( !( $( "*[parent-reference='" + reference + "']" )
+												.find( "*[parent-reference='" + parentReference + "']" ).length ) )
+											{
+												return;
+											}
+										}
 
-							$scope.$on( "close-view",
-								function( event, reference, viewType, closeChildrens ){
-									if( parentReference != reference ){
-										//We invert things because we are traversing the child and every child claims
-										//	to be the parent so the reference will be the parent and the parentReference is the child.
-										//What we want to check here if the child reference is a valid child of the parent reference.
-										if( !( $( "*[parent-reference='" + reference + "']" )
-											.find( "*[parent-reference='" + parentReference + "']" ).length ) )
+										//This will force to close only all childrens.
+										if( closeChildrens
+											&& parentReference == reference )
 										{
 											return;
 										}
-									}
 
-									//This will force to close only all childrens.
-									if( closeChildrens
-										&& parentReference == reference )
-									{
-										return;
-									}
+										$timeout( function( ){
+											$scope.$emit( "adjust-dividers" );
+										}, 0 );
 
-									$timeout( function( ){
-										$scope.$emit( "adjust-dividers" );
-									}, 0 );
+										view.aTable.removeClass( "viewable" );
+										view.aTable.hide( );
 
-									view.aTable.removeClass( "viewable" );
-									view.aTable.hide( );
+										var iconTypeCollapse = "glyphicon-th-large";
+										var iconTypeExpand = "glyphicon-th";
+										switch( viewType ){
+											case "map":
+												iconTypeCollapse = "glyphicon-move";
+												iconTypeExpand = "glyphicon-fullscreen";
+												break;
 
-									var iconTypeCollapse = "glyphicon-th-large";
-									var iconTypeExpand = "glyphicon-th";
-									switch( viewType ){
-										case "map":
-											iconTypeCollapse = "glyphicon-move";
-											iconTypeExpand = "glyphicon-fullscreen";
-											break;
+											case "list":
+												iconTypeCollapse = "glyphicon-th-list";
+												iconTypeExpand = "glyphicon-list";
+												break;
+										}
+										
+										//There should only be one of this.
+										view.parent.removeClass( "parent-view-select" );
+										view.parent.find( "i.view-type" )
+											.removeClass( iconTypeExpand )
+											.addClass( iconTypeCollapse );
+										
+										view.subContainer
+											.removeClass( "view-select" )
+											.removeClass( "view-expand" );
+										
+										view.container
+											.removeClass( "view-select" )
+											.hide( );
 
-										case "list":
-											iconTypeCollapse = "glyphicon-th-list";
-											iconTypeExpand = "glyphicon-list";
-											break;
-									}
-									
-									//There should only be one of this.
-									view.parent.removeClass( "parent-view-select" );
-									view.parent.find( "i.view-type" )
-										.removeClass( iconTypeExpand )
-										.addClass( iconTypeCollapse );
-									
-									view.subContainer
-										.removeClass( "view-select" )
-										.removeClass( "view-expand" );
-									
-									view.container
-										.removeClass( "view-select" )
-										.hide( );
+										view.divider.hide( );
+										view.spacer.hide( );
 
-									view.divider.hide( );
-									view.spacer.hide( );
+										$scope.$emit( "clear-controllers", reference );
+										$scope.$broadcast( "clear-controllers", reference );
+									} );
 
-									$scope.$emit( "clear-controllers", reference );
-									$scope.$broadcast( "clear-controllers", reference );
-								} );
+								$scope.$on( "click-view",
+									function( event, reference, viewType ){
+										if( parentReference != reference ){
+											return;
+										}
 
-							$scope.$on( "click-view",
-								function( event, reference, viewType ){
-									if( parentReference != reference ){
-										return;
-									}
+										if( view.aTable.hasClass( "viewable" ) ){
+											$scope.$broadcast( "close-view", reference, viewType );
+											return;
+										}
 
-									if( view.aTable.hasClass( "viewable" ) ){
-										$scope.$broadcast( "close-view", reference, viewType );
-										return;
-									}
+										$timeout( function( ){
+											$scope.$emit( "adjust-dividers" );
+										}, 0 );
 
-									$timeout( function( ){
-										$scope.$emit( "adjust-dividers" );
-									}, 0 );
+										var iconTypeCollapse = "glyphicon-th-large";
+										var iconTypeExpand = "glyphicon-th";
+										switch( viewType ){
+											case "map":
+												iconTypeCollapse = "glyphicon-move";
+												iconTypeExpand = "glyphicon-fullscreen";
+												break;
 
-									var iconTypeCollapse = "glyphicon-th-large";
-									var iconTypeExpand = "glyphicon-th";
-									switch( viewType ){
-										case "map":
-											iconTypeCollapse = "glyphicon-move";
-											iconTypeExpand = "glyphicon-fullscreen";
-											break;
+											case "list":
+												iconTypeCollapse = "glyphicon-th-list";
+												iconTypeExpand = "glyphicon-list";
+												break;
+										}
 
-										case "list":
-											iconTypeCollapse = "glyphicon-th-list";
-											iconTypeExpand = "glyphicon-list";
-											break;
-									}
+										view.aTable.addClass( "viewable" );
+										view.aTable.show( );
+										
+										//There should only be one of this.
+										view.parent.addClass( "parent-view-select" );
+										view.parent.find( "i.view-type" )
+											.addClass( iconTypeExpand )
+											.removeClass( iconTypeCollapse );
 
-									view.aTable.addClass( "viewable" );
-									view.aTable.show( );
-									
-									//There should only be one of this.
-									view.parent.addClass( "parent-view-select" );
-									view.parent.find( "i.view-type" )
-										.addClass( iconTypeExpand )
-										.removeClass( iconTypeCollapse );
+										view.subContainer
+											.addClass( "view-select" )
+											.addClass( "view-expand" );
+										
+										view.container
+											.addClass( "view-select" )
+											.show( );
 
-									view.subContainer
-										.addClass( "view-select" )
-										.addClass( "view-expand" );
-									
-									view.container
-										.addClass( "view-select" )
-										.show( );
+										view.divider.show( );
+										view.spacer.show( );
 
-									view.divider.show( );
-									view.spacer.show( );
+										//Transfer on expanded view set.
+										$scope.$broadcast( "transfer-view-set", reference );
+									} );
 
-									//Transfer on expanded view set.
-									$scope.$broadcast( "transfer-view-set", reference );
-								} );
+								$scope.$emit( "click-view", parentReference, parentViewType );
+							}, 0 );
+
+							return;
 						}
 
 						$scope.$emit( "click-view", parentReference, parentViewType );
@@ -820,8 +828,51 @@
 									}
 								} );
 
+							scope.$on( "set-body",
+								function( event, reference ){
+									if( scope.reference == reference ){
+										if( scope.view ){
+											scope.body = scope.preBody;	
+										}
+										
+										$timeout( function( ){
+											//If this is a view assign a parent reference.
+											if( scope.view ){
+												container
+													.parents( "td, tr" )
+													.each( function( ){
+														if( !$( this ).attr( "parent-reference" ) ){
+															$( this ).attr( "parent-reference", scope.reference );	
+														}
+													} );
+												container
+													.find( "table, thead, tbody, tfoot, tr, th, td" )
+													.each( function( ){
+														if( !$( this ).attr( "parent-reference" ) ){
+															$( this ).attr( "parent-reference", scope.reference );	
+														}
+													} );
+
+												scope.views = scope.preViews;
+											}
+
+											//Preformatting for array indices.
+											$( "td > span:contains(':'), th > span:contains(':')" )
+												.each( function( ){
+													var span = $( this );
+													var contents = span.html( );
+													var index = contents.match( /\d+/ );
+													contents = contents.replace( /^\:/, "<i class=\"glyphicon glyphicon-align-justify\"></i>" );
+													span.html( contents );
+													span.attr( "title", "Index: " + index );
+													$( "> i", span ).attr( "title", "Index: " + index );
+												} );
+										}, 0 );
+									}
+								} );
+
 							//This is for testing purposes only.
-							if( _.isEmpty( scope.data ) ){
+							if( _.isEmpty( scope.data ) && !scope.view ){
 								scope.data = dummyData;
 							}		
 
@@ -968,11 +1019,16 @@
 													} ) );
 											}
 
+											var body = scope.body;
+											if( scope.view ){
+												body = scope.preBody = [ ];
+											}
+
 											var views = [ ];
 											_.each( data,
 												function( row, index ){
 													//Push data to the right visible columns.
-													scope.body.push( _.without( _.map( scope.header,
+													body.push( _.without( _.map( scope.header,
 														function( column ){
 															var rowData;
 															if( typeof row[ column ] != "boolean"
@@ -1009,38 +1065,14 @@
 												} );
 
 											$timeout( function( ){
-												//If this is a view assign a parent reference.
-												if( scope.view ){
-													container
-														.parents( "td, tr" )
-														.each( function( ){
-															if( !$( this ).attr( "parent-reference" ) ){
-																$( this ).attr( "parent-reference", scope.reference );	
-															}
-														} );
-													container
-														.find( "table, thead, tbody, tfoot, tr, th, td" )
-														.each( function( ){
-															if( !$( this ).attr( "parent-reference" ) ){
-																$( this ).attr( "parent-reference", scope.reference );	
-															}
-														} );	
+												if( !scope.view ){
+													scope.$emit( "set-body", scope.reference );	
+													//We put it here so that after assigning parent reference to views
+													//	this will not break things.
+													scope.views = views;
+												}else{
+													scope.preViews = views;
 												}
-
-												//Preformatting for array indices.
-												$( "td > span:contains(':'), th > span:contains(':')" ).each( function( ){
-													var span = $( this );
-													var contents = span.html( );
-													var index = contents.match( /\d+/ );
-													contents = contents.replace( /^\:/, "<i class=\"glyphicon glyphicon-align-justify\"></i>" );
-													span.html( contents );
-													span.attr( "title", "Index: " + index );
-													$( "> i", span ).attr( "title", "Index: " + index );
-												} );
-
-												//We put it here so that after assigning parent reference to views
-												//	this will not break things.
-												scope.views = views;
 											}, 0 );		
 										}, 0 );	
 									}
