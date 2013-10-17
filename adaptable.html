@@ -126,6 +126,13 @@
 				display: none;
 			}
 
+			adapt-table > div.table-container > table > tbody > tr > td div.overview {
+				height: 42px !important;
+				border: 1px solid #e0e0e0 !important;
+				margin-bottom: 1px !important;
+				padding: 2px !important;
+			}
+
 			adapt-table > div.table-container > table > tbody > tr > td > 
 				div > view-controllers > button:first-child {
 				margin-right: 1px;
@@ -359,7 +366,15 @@
 							$scope.$emit( "clear-controllers", reference );
 							$scope.$broadcast( "clear-controllers", reference );
 						}
-					}
+					};
+
+					$scope.activateOverview = function activateOverview( reference ){
+						if( $scope.overviewReference != reference ){
+
+						}else{
+
+						}
+					};
 
 					$scope.hoverOn = function hoverOn( reference ){
 						$scope.$emit( "hover-on", reference || $scope.reference );
@@ -391,7 +406,8 @@
 									"divider": $( "tr.divider[parent-reference='" + parentReference + "']" ),
 									"spacer": $( "tr.spacer[parent-reference='" + parentReference + "']" ),
 									"identifier": $( "div.identifier[parent-reference='" + parentReference + "']" ),
-									"controllers": $( "div.controllers[parent-reference='" + parentReference + "']" )
+									"controllers": $( "div.controllers[parent-reference='" + parentReference + "']" ),
+									"overview": $( "div.overview[parent-reference='" + parentReference + "']" )
 								}
 								view = $scope.viewCache[ parentReference ];
 
@@ -495,6 +511,16 @@
 										if( activeControllers.length ){
 											activeControllers.removeClass( "controllers-active" );
 										}
+									} );
+
+								$scope.$on( "pass-overview",
+									function( event, reference ){
+
+									} );
+
+								$scope.$on( "clear-overview",
+									function( event, reference ){
+
 									} );
 
 								$scope.$on( "close-view",
@@ -619,6 +645,34 @@
 						}
 
 						$scope.$emit( "click-view", parentReference, parentViewType );
+					};
+				} );
+
+			adaptTable.directive( "overviewPane",
+				function( $timeout, $compile ){
+					return {
+						"require": "?^",
+						"restrict": "E",
+						"controller": "AdaptTableController",
+						"scope": {
+							"reference": "=?",
+							"data": "=?"
+						},
+						"template":
+							"<ol class=\"breadcrumb\">" + 
+								"<li ng-repeat=\"ancestry in ancestryList\" " +
+									"class=\"ancestry\">" +
+									"<span ng-bind=\"ancestry\"></span>" + 
+								"</li>" +
+								"<li ng-repeat=\"info in infoList\" " +
+									"class=\"info\">" +
+									"<span ng-bind=\"\"></span>" +
+								"</li>" +
+							"</ol>",
+						"link": function( scope, element ){
+							var ancestors = scope.data.$columnAncestry.split( /\b(?=\.|\:)/ );
+							scope.ancestryList = _.map(  )
+						}
 					};
 				} );
 
@@ -777,7 +831,8 @@
 							"view": "=?",
 							"reference": "=?",
 							"level": "=?",
-							"columns": "=?"
+							"columns": "=?",
+							"columnAncestry": "@?"
 						},
 						"link": function( scope, element ){
 							var container = $( element );
@@ -941,7 +996,9 @@
 												var columns = _.keys( row );
 												
 												var filteredColumns = _.chain( columns )
-													.without( "$reference", "toString" )
+													.without( "$columnAncestry", 
+														"$reference", 
+														"toString" )
 													.map( function( column ){
 														return column.replace( "$", ":" );
 													} )
@@ -1044,6 +1101,22 @@
 																if( typeof rowData == "object" ){
 																	rowData.$reference = Date.now( ) 
 																		+ Math.round( Math.random( ) * Date.now( ) );
+																	var columnAncestry = scope.columnAncestry;
+																	var realColumn = "." + column;
+																	if( viewType == "list" ){
+																		var location;
+																		if( location = row[ "key" ] ){
+																			realColumn = "." + location;
+																		}else if( location = row[ "index" ] ){
+																			realColumn = location;
+																		}
+																	}
+																	if( !columnAncestry ){
+																		rowData.$columnAncestry = realColumn.replace( ".", "" );
+																	}else{
+																		rowData.$columnAncestry = columnAncestry + realColumn;
+																	}
+
 																	views.push( rowData );
 
 																	Object.defineProperty( rowData, "toString",
@@ -1094,15 +1167,18 @@
 						"link": function( scope, element ){
 							var reference = scope.data.$reference;
 							var viewType = scope.data.$viewType;
+							var columnAncestry = scope.data.$columnAncestry;
 							scope.reference = reference;
 							scope.viewType = viewType;
+							scope.columnAncestry = columnAncestry;
 
 							var adaptTableView = $( "<adapt-table></adapt-table>" );
 							adaptTableView.attr( {
 								"data": "data",
 								"view": "true",
 								"reference": reference,
-								"level": scope.level
+								"level": scope.level,
+								"column-ancestry": columnAncestry
 							} );
 									
 							var container = $( element );
@@ -1123,6 +1199,10 @@
 										.addClass( "controllers col-md-12" )
 										.attr( "parent-reference", reference );
 
+									var overview = $( "<div></div>" )
+										.addClass( "overview col-md-12" )
+										.attr( "parent-reference", reference );
+
 									var identifier = $( "<div></div>" )
 										.addClass( "identifier" )
 										.attr( "parent-reference", reference );
@@ -1137,6 +1217,7 @@
 											scope.hoverOff( reference );
 										} )
 										.append( controllers )
+										.append( overview )
 										.append( identifier )
 										.append( view );
 
