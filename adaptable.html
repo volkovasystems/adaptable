@@ -821,12 +821,11 @@
 									}
 								} ) );
 
-							//TODO: This is buggy!
+							//TODO: This is/may be buggy!
 							//This will try to interpret the complex arrangement 
 							//	of the dynamic data structure.
 							var child = _.last( scope.ancestryList );
-							console.debug( child );
-
+							
 							if( ( /^\d+$/ ).test( child.column ) ){
 								child.column = +child.column;
 							}
@@ -846,7 +845,6 @@
 								}	
 							}
 							
-							console.debug( childData );
 							// var childDataStructure = childData.constructor.name.toLowerCase( );
 							// scope.infoList
 						}
