@@ -119,7 +119,6 @@
             }
 
             adapt-table > div.table-container > table > tbody > tr > td > div.controllers {
-                height: 42px !important;
                 border: 1px solid #e0e0e0 !important;
                 margin-bottom: 1px !important;
                 padding: 2px !important;
@@ -127,10 +126,67 @@
             }
 
             adapt-table > div.table-container > table > tbody > tr > td div.overview {
-                height: 42px !important;
                 border: 1px solid #e0e0e0 !important;
                 margin-bottom: 1px !important;
                 padding: 2px !important;
+                display: none;
+            }
+
+            adapt-table > div.table-container > table > tbody > tr > 
+                td div.overview overview-pane {
+                display: block;
+            }
+
+            adapt-table > div.table-container > table > tbody > tr > 
+                td div.overview overview-pane > ol {
+                border-radius: 0px !important;
+                -moz-border-radius: 0px !important;
+                -webkit-border-radius: 0px !important;
+                margin-bottom: 0px !important;
+            }           
+
+            adapt-table > div.table-container > table > tbody > tr > 
+                td div.overview-active {
+                display: block !important;
+            }
+
+            adapt-table > div.table-container > table > tbody > tr > 
+                td div.overview-active > overview-pane
+                .ancestry > span {
+                text-transform: capitalize;
+            }
+
+            adapt-table > div.table-container > table > tbody > tr > 
+                td div.overview-active > overview-pane
+                .ancestry > i.separator{
+                margin-left: 12px;
+                color: #a0a0a0;
+                cursor: normal !important;
+            }
+
+            adapt-table > div.table-container > table > tbody > tr > 
+                td div.overview-active > overview-pane
+                .ancestry > .row-reference:before {
+                content: ":";
+                letter-spacing: 1px;
+            }
+
+            adapt-table > div.table-container > table > tbody > tr > 
+                td div.overview-active > overview-pane
+                .ancestry > .column-reference {
+                margin-right: 1px;
+            }
+
+            adapt-table > div.table-container > table > tbody > tr > 
+                td div.overview-active > overview-pane
+                .ancestry.object:nth-child(n+1):before {
+                content: "";
+            }
+
+            adapt-table > div.table-container > table > tbody > tr > 
+                td div.overview-active > overview-pane 
+                .ancestry.array:nth-child(n+1):before {
+                content: "";
             }
 
             adapt-table > div.table-container > table > tbody > tr > td > 
@@ -174,7 +230,7 @@
                 width: 100% !important;
             }
 
-            @media screen and (max-width: 600px) {
+            @media screen and (max-width: 800px) {
                 adapt-table > div.table-container > table > tbody > tr > td > 
                     div > view-controllers > button > span {
                     display: none !important;
@@ -3654,6 +3710,7 @@
                 }
             ];
             
+
             var adaptTable = angular.module( "adaptable", [ ] );
             adaptTable.constant( "dummyData", data );
             adaptTable.controller( "AdaptTableController",
@@ -3674,11 +3731,21 @@
                         }
                     };
 
-                    $scope.activateOverview = function activateOverview( reference ){
+                    $scope.activateOverview = function activateOverview( reference, viewType ){
                         if( $scope.overviewReference != reference ){
-
+                            $scope.overviewReference = reference;
+                            $scope.$emit( "pass-overview", reference, viewType );
+                            $scope.$broadcast( "pass-overview", reference, viewType );
+                            $scope.$broadcast( "toggle-controller", reference, "overview" );
+                            
+                            //Transfer when controls are activated.
+                            $scope.$broadcast( "transfer-view-set", reference );
+                            $scope.$broadcast( "close-view", reference, viewType, true );
                         }else{
-
+                            $scope.overviewReference = null;
+                            $scope.$broadcast( "toggle-controller", reference, "overview" );
+                            $scope.$emit( "clear-overview", reference );
+                            $scope.$broadcast( "clear-overview", reference );
                         }
                     };
 
@@ -3820,13 +3887,45 @@
                                     } );
 
                                 $scope.$on( "pass-overview",
-                                    function( event, reference ){
-
+                                    function( event, reference, viewType ){
+                                        $( ".overview-active" ).removeClass( "overview-active" );
+                                        $scope.overviewReference = reference;
+                                        $timeout( function( ){
+                                            if( view.overview.attr( "parent-reference" ) == reference ){
+                                                view.overview.addClass( "overview-active" );
+                                                if( !view.overview.find( "overview-pane" ).length ){
+                                                    var overviewPane = $( "<overview-pane></overview-pane>" );
+                                                    overviewPane.attr( {
+                                                        "reference": reference,
+                                                        "data": "data",
+                                                        "view-type": viewType,
+                                                        "column-ancestry": view.overview.attr( "column-ancestry" ),
+                                                        "row-ancestry": view.overview.attr( "row-ancestry" )
+                                                    } );
+                                                    view.overview.append( overviewPane );
+                                                    $compile( view.overview.children( )[ 0 ] )( $scope );
+                                                }
+                                                $timeout( function( ){
+                                                    $scope.$emit( "adjust-dividers" );
+                                                }, 0 );
+                                            }
+                                        }, 0 );
                                     } );
 
                                 $scope.$on( "clear-overview",
                                     function( event, reference ){
-
+                                        $scope.overviewReference = null;
+                                        if( view.overview.attr( "parent-reference" ) == reference ){
+                                            view.overview.removeClass( "overview-active" );
+                                            $timeout( function( ){
+                                                $scope.$emit( "adjust-dividers" );
+                                            }, 0 );
+                                        }
+                                        var activeOverview = $( "adapt-view[reference='" + reference + "']" )
+                                            .find( ".overview-active" );
+                                        if( activeOverview.length ){
+                                            activeOverview.removeClass( "overview-active" );
+                                        }
                                     } );
 
                                 $scope.$on( "close-view",
@@ -3962,13 +4061,23 @@
                         "controller": "AdaptTableController",
                         "scope": {
                             "reference": "=?",
-                            "data": "=?"
+                            "data": "=?",
+                            "viewType": "@?",
+                            "columnAncestry": "@?",
+                            "rowAncestry": "@?"
                         },
                         "template":
                             "<ol class=\"breadcrumb\">" + 
                                 "<li ng-repeat=\"ancestry in ancestryList\" " +
-                                    "class=\"ancestry\">" +
-                                    "<span ng-bind=\"ancestry\"></span>" + 
+                                    "class=\"ancestry {{ ancestry.type }}\">" +
+                                    "<i class=\"glyphicon glyphicon-align-justify\" " + 
+                                        "ng-if=\"ancestry.type == 'array'\"></i>" +
+                                    "<i class=\"glyphicon glyphicon-unchecked\" " +
+                                        "ng-if=\"ancestry.type == 'object'\"></i>" +
+                                    "<span class=\"column-reference\" ng-bind=\"ancestry.column\"></span>" + 
+                                    "<span class=\"row-reference\" ng-bind=\"ancestry.row\"></span>" + 
+                                    "<i class=\"separator glyphicon glyphicon-chevron-right\" " +
+                                        "ng-if=\"( $index + 1 ) < ancestryList.length\"></i>" +
                                 "</li>" +
                                 "<li ng-repeat=\"info in infoList\" " +
                                     "class=\"info\">" +
@@ -3976,17 +4085,71 @@
                                 "</li>" +
                             "</ol>",
                         "link": function( scope, element ){
-                            var ancestors = scope.data.$columnAncestry.split( /\b(?=\.|\:)/ );
-                            scope.ancestryList = _.compact( _.map( ancestors,
-                                function( ancestor ){
-                                    if( ( /^[\:]/ ).test( ancestor ) ){
-                                        return "index: " + ancestor.replace( ":", "" );
-                                    }else if( ( /^[\:]/ ).test( ancestor ) ){
-                                        return ancestor.replace( ".", "" );
+                            console.debug( scope );
+                            var columnAncestors = scope.columnAncestry.split( /\b(?=\.|\:)/ );
+                            var rowAncestors = scope.rowAncestry.split( "," );
+                            var structure = scope.data.constructor.name.toLowerCase( );
+                            scope.ancestryList = _.compact( _.map( columnAncestors,
+                                function( ancestor, index ){
+                                    if( ( /^\:/ ).test( ancestor ) ){
+                                        return {
+                                            "type": "array",
+                                            //"structure": structure,
+                                            "column": ancestor.replace( ":", "" ),
+                                            "row": rowAncestors[ index ]
+                                        };
+                                    }else if( ( /\$/ ).test( ancestor ) ){
+                                        return {
+                                            "type": "array",
+                                            //"structure": structure,
+                                            "column": ancestor.replace( /[\.|\$]/g, "" ),
+                                            "row": rowAncestors[ index ]
+                                        };  
+                                    }else if( ( /^\./ ).test( ancestor ) ){ 
+                                        return {
+                                            "type": "object",
+                                            //"structure": structure,
+                                            "column": ancestor.replace( ".", "" ),
+                                            "row": rowAncestors[ index ]
+                                        };
                                     }else if( ancestor ){
-                                        return ancestor;
+                                        return {
+                                            "type": "object",
+                                            //"structure": structure,
+                                            "column": ancestor,
+                                            "row": rowAncestors[ index ]
+                                        };
                                     }
                                 } ) );
+
+                            //TODO: This is buggy!
+                            //This will try to interpret the complex arrangement 
+                            //  of the dynamic data structure.
+                            var child = _.last( scope.ancestryList );
+                            console.debug( child );
+
+                            if( ( /^\d+$/ ).test( child.column ) ){
+                                child.column = +child.column;
+                            }
+                            if( ( /^\d+$/ ).test( child.row ) ){
+                                child.row = +child.row;
+                            }
+                            var childData = scope.data[ child.row ]
+                            if( childData === undefined ){
+                                childData = scope.data[ child.column ];
+                                if( childData === undefined ){
+                                    childData = scope.data; 
+                                }
+                            }else{
+                                childData = childData[ child.column ];
+                                if( childData === undefined ){
+                                    childData = scope.data[ child.column ];
+                                }   
+                            }
+                            
+                            console.debug( childData );
+                            // var childDataStructure = childData.constructor.name.toLowerCase( );
+                            // scope.infoList
                         }
                     };
                 } );
@@ -4019,7 +4182,8 @@
                                 "<i class=\"glyphicon glyphicon-filter\"></i>" +
                                 "<span>View filters.</span>" +
                             "</button>" + 
-                            "<button class=\"view-overview btn\">" +
+                            "<button class=\"view-overview btn\" " +
+                                "ng-click=\"activateOverview(reference, viewType);\">" +
                                 "<i class=\"glyphicon glyphicon-info-sign\"></i>" +
                                 "<span>View overviews.</span>" +
                             "</button>",
@@ -4045,42 +4209,37 @@
                                     }
                                 } );
 
+                            scope.$on( "toggle-controller",
+                                function( event, reference, controller ){
+                                    if( scope.reference == reference ){
+                                        if( container.find( ".view-" + controller + ".view-toggled" ).length ){
+                                            container.find( ".view-" + controller ).removeClass( "view-toggled btn-primary" );
+                                        }else{
+                                            container.find( ".view-" + controller ).addClass( "view-toggled btn-primary" );
+                                        }
+                                    }
+                                } );
+
                             //Emit on first.
                             scope.$emit( "disable-view-type", reference, currentViewType );
 
                             container
                                 .find( "button" )
                                 .mouseover( function( ){
-                                    $( this ).addClass( "btn-primary" );
+                                    var button = $( this );
+                                    if( !button.hasClass( "view-toggled" ) ){
+                                        button.addClass( "btn-primary" );
+                                    }
                                 } )
                                 .mouseout( function( ){
-                                    $( this ).removeClass( "btn-primary" );
+                                    var button = $( this );
+                                    if( !button.hasClass( "view-toggled" ) ){
+                                        button.removeClass( "btn-primary" );
+                                    }
                                 } );
                         }
                     };
                 } );
-
-            adaptTable.directive( "viewOverviews",
-                function( $timeout, $compile ){
-                    return {
-                        "require": "?^",
-                        "restrict": "E",
-                        "controller": "AdaptTableController",
-                        "scope": {
-                            "reference": "=?",
-                            "data": "=?",
-                        },
-                        "template": "",
-                        "link": function( scope, element ){
-                            var container = $( element );
-
-                            var reference = scope.reference;
-                            
-                        }
-                    };
-                } );
-
-            
 
             adaptTable.directive( "adaptTable",
                 function( dummyData, $timeout, $compile ){
@@ -4147,7 +4306,8 @@
                             "reference": "=?",
                             "level": "=?",
                             "columns": "=?",
-                            "columnAncestry": "@?"
+                            "columnAncestry": "@?",
+                            "rowAncestry": "@?"
                         },
                         "link": function( scope, element ){
                             var container = $( element );
@@ -4312,6 +4472,7 @@
                                                 
                                                 var filteredColumns = _.chain( columns )
                                                     .without( "$columnAncestry", 
+                                                        "$rowAncestry",
                                                         "$reference", 
                                                         "toString" )
                                                     .map( function( column ){
@@ -4416,6 +4577,17 @@
                                                                 if( typeof rowData == "object" ){
                                                                     rowData.$reference = Date.now( ) 
                                                                         + Math.round( Math.random( ) * Date.now( ) );
+                                                                    
+                                                                    var rowAncestry = scope.rowAncestry;
+                                                                    if( !rowAncestry ){
+                                                                        rowAncestry = [ ];
+                                                                    }else{
+                                                                        rowAncestry = rowAncestry.split( "," );
+                                                                    }
+                                                                    rowAncestry.push( index );
+                                                                    rowAncestry = rowAncestry.join( "," );
+                                                                    rowData.$rowAncestry = rowAncestry;
+
                                                                     var columnAncestry = scope.columnAncestry;
                                                                     var realColumn = "." + column;
                                                                     if( viewType == "list" ){
@@ -4483,9 +4655,11 @@
                             var reference = scope.data.$reference;
                             var viewType = scope.data.$viewType;
                             var columnAncestry = scope.data.$columnAncestry;
+                            var rowAncestry = scope.data.$rowAncestry;
                             scope.reference = reference;
                             scope.viewType = viewType;
                             scope.columnAncestry = columnAncestry;
+                            scope.rowAncestry = rowAncestry;
 
                             var adaptTableView = $( "<adapt-table></adapt-table>" );
                             adaptTableView.attr( {
@@ -4493,7 +4667,8 @@
                                 "view": "true",
                                 "reference": reference,
                                 "level": scope.level,
-                                "column-ancestry": columnAncestry
+                                "column-ancestry": columnAncestry,
+                                "row-ancestry": rowAncestry
                             } );
                                     
                             var container = $( element );
@@ -4516,6 +4691,8 @@
 
                                     var overview = $( "<div></div>" )
                                         .addClass( "overview col-md-12" )
+                                        .attr( "column-ancestry", columnAncestry )
+                                        .attr( "row-ancestry", rowAncestry )
                                         .attr( "parent-reference", reference );
 
                                     var identifier = $( "<div></div>" )
@@ -4532,7 +4709,7 @@
                                             scope.hoverOff( reference );
                                         } )
                                         .append( controllers )
-                                        //.append( overview )
+                                        .append( overview )
                                         .append( identifier )
                                         .append( view );
 
