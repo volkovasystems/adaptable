@@ -3718,34 +3718,32 @@
 
                     $scope.activateControllers = function activateControllers( reference, viewType ){
                         if( $scope.controllerReference != reference ){
-                            $scope.$emit( "pass-controllers", reference );
-                            $scope.$broadcast( "pass-controllers", reference );
+                            $scope.$root.$broadcast( "pass-controllers", reference );
                             $scope.$broadcast( "disable-view-type", reference, viewType );
+                            $scope.$root.$broadcast( "clear-overview", reference );
+                            $scope.$root.$broadcast( "clear-overview-reference" );
 
                             //Transfer when controls are activated.
                             $scope.$broadcast( "transfer-view-set", reference );
                             $scope.$broadcast( "close-view", reference, viewType, true );
                         }else{
-                            $scope.$emit( "clear-controllers", reference );
-                            $scope.$broadcast( "clear-controllers", reference );
+                            $scope.$root.$broadcast( "clear-controllers", reference );
+                            $scope.$root.$broadcast( "clear-overview", reference );
+                            $scope.$root.$broadcast( "clear-overview-reference" );
                         }
                     };
 
                     $scope.activateOverview = function activateOverview( reference, viewType ){
                         if( $scope.overviewReference != reference ){
                             $scope.overviewReference = reference;
-                            $scope.$emit( "pass-overview", reference, viewType );
-                            $scope.$broadcast( "pass-overview", reference, viewType );
-                            $scope.$broadcast( "toggle-controller", reference, "overview" );
+                            $scope.$root.$broadcast( "pass-overview", reference, viewType );
                             
                             //Transfer when controls are activated.
                             $scope.$broadcast( "transfer-view-set", reference );
                             $scope.$broadcast( "close-view", reference, viewType, true );
                         }else{
                             $scope.overviewReference = null;
-                            $scope.$broadcast( "toggle-controller", reference, "overview" );
-                            $scope.$emit( "clear-overview", reference );
-                            $scope.$broadcast( "clear-overview", reference );
+                            $scope.$root.$broadcast( "clear-overview", reference );
                         }
                     };
 
@@ -3907,6 +3905,7 @@
                                                 }
                                                 $timeout( function( ){
                                                     $scope.$emit( "adjust-dividers" );
+                                                    $scope.$broadcast( "toggle-controller", reference, "overview", true );
                                                 }, 0 );
                                             }
                                         }, 0 );
@@ -3919,12 +3918,20 @@
                                             view.overview.removeClass( "overview-active" );
                                             $timeout( function( ){
                                                 $scope.$emit( "adjust-dividers" );
+                                                $scope.$broadcast( "toggle-controller", reference, "overview", false );
                                             }, 0 );
                                         }
                                         var activeOverview = $( "adapt-view[reference='" + reference + "']" )
                                             .find( ".overview-active" );
                                         if( activeOverview.length ){
                                             activeOverview.removeClass( "overview-active" );
+                                            $scope.$emit( "toggle-controller", reference, "overview", false );
+                                        }else{
+                                            activeOverview = $( ".overview-active[reference!='" + reference + "']" );
+                                            if( activeOverview.length ){
+                                                activeOverview.removeClass( "overview-active" );
+                                                $scope.$root.$broadcast( "toggle-controller", reference, "overview", false );
+                                            }
                                         }
                                     } );
 
@@ -4085,7 +4092,6 @@
                                 "</li>" +
                             "</ol>",
                         "link": function( scope, element ){
-                            console.debug( scope );
                             var columnAncestors = scope.columnAncestry.split( /\b(?=\.|\:)/ );
                             var rowAncestors = scope.rowAncestry.split( "," );
                             var structure = scope.data.constructor.name.toLowerCase( );
@@ -4209,10 +4215,19 @@
                                     }
                                 } );
 
+                            scope.$on( "clear-overview-reference",
+                                function( event ){
+                                    scope.overviewReference = null;
+                                } );
+
                             scope.$on( "toggle-controller",
-                                function( event, reference, controller ){
+                                function( event, reference, controller, forceState ){
                                     if( scope.reference == reference ){
-                                        if( container.find( ".view-" + controller + ".view-toggled" ).length ){
+                                        if( forceState === true ){
+                                            container.find( ".view-" + controller ).addClass( "view-toggled btn-primary" ); 
+                                        }else if( forceState === false ){
+                                            container.find( ".view-" + controller ).removeClass( "view-toggled btn-primary" );
+                                        }else if( container.find( ".view-" + controller + ".view-toggled" ).length ){
                                             container.find( ".view-" + controller ).removeClass( "view-toggled btn-primary" );
                                         }else{
                                             container.find( ".view-" + controller ).addClass( "view-toggled btn-primary" );

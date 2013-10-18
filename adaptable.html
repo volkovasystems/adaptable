@@ -411,20 +411,16 @@
 
 					$scope.activateControllers = function activateControllers( reference, viewType ){
 						if( $scope.controllerReference != reference ){
-							$scope.$emit( "pass-controllers", reference );
-							$scope.$broadcast( "pass-controllers", reference );
+							$scope.$root.$broadcast( "pass-controllers", reference );
 							$scope.$broadcast( "disable-view-type", reference, viewType );
+							$scope.$root.$broadcast( "clear-overview", reference );
+							$scope.$root.$broadcast( "clear-overview-reference" );
 
 							//Transfer when controls are activated.
 							$scope.$broadcast( "transfer-view-set", reference );
 							$scope.$broadcast( "close-view", reference, viewType, true );
-
-							$scope.$root.$broadcast( "clear-overview", reference );
-							$scope.$root.$broadcast( "clear-overview-reference" );
 						}else{
-							$scope.$emit( "clear-controllers", reference );
-							$scope.$broadcast( "clear-controllers", reference );
-
+							$scope.$root.$broadcast( "clear-controllers", reference );
 							$scope.$root.$broadcast( "clear-overview", reference );
 							$scope.$root.$broadcast( "clear-overview-reference" );
 						}
@@ -433,17 +429,14 @@
 					$scope.activateOverview = function activateOverview( reference, viewType ){
 						if( $scope.overviewReference != reference ){
 							$scope.overviewReference = reference;
-							$scope.$emit( "pass-overview", reference, viewType );
-							$scope.$broadcast( "pass-overview", reference, viewType );
+							$scope.$root.$broadcast( "pass-overview", reference, viewType );
 							
 							//Transfer when controls are activated.
 							$scope.$broadcast( "transfer-view-set", reference );
 							$scope.$broadcast( "close-view", reference, viewType, true );
 						}else{
 							$scope.overviewReference = null;
-							
-							$scope.$emit( "clear-overview", reference );
-							$scope.$broadcast( "clear-overview", reference );
+							$scope.$root.$broadcast( "clear-overview", reference );
 						}
 					};
 
