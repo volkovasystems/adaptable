@@ -1,0 +1,240 @@
+i {
+	margin-right: 3px;
+	cursor: pointer;
+	font-size: 15.5px !important;
+	text-shadow:0.5px 0.5px 2px #a0a0a0 !important;
+}
+
+i.glyphicon-th-list,
+i.glyphicon-move,
+i.glyphicon-cog,
+i.glyphicon-th {
+	transform: scale(0.96,0.96) !important;
+	-ms-transform: scale(0.96,0.96) !important;
+	-webkit-transform: scale(0.96,0.96) !important;
+	-moz-transform: scale(0.96,0.96) !important;
+}
+
+i.view-type:hover,
+i.view-controls:hover {
+	text-shadow:0.5px 0.5px 4px #3276b1 !important;	
+}
+
+adapt-table {
+	display: block;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td >
+	i.button-controller{
+	display: none;
+}
+adapt-table > div.table-container > table > tbody > tr > td.parent-view-select > 
+	i.button-controller {
+	display: block !important;
+	float: right !important;
+}
+
+adapt-table > div.table-container > table > thead > tr > th > span,
+adapt-table > div.table-container > table > tfoot > tr > th > span {
+	text-transform: capitalize;
+}
+
+adapt-table > div.table-container > table > thead > tr > th {
+	padding: 12px !important;
+}
+
+adapt-table > div.table-container,
+adapt-view > adapt-table > div.table-container,
+adapt-table > div.table-container > table,
+adapt-view > adapt-table > div.table-container > table {
+	margin: 0px !important;
+	padding: 0px !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td.sub-container {
+	padding: 0px;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td.view-select,
+adapt-table > div.table-container > table > tbody > tr > td.view-select:hover,
+adapt-table > div.table-container > table > tbody > tr.overview > td.overview {
+	border-top: 1px solid #a0a0a0 !important;
+	border-left: 1px solid #a0a0a0 !important;
+	border-right: 1px solid #a0a0a0 !important;
+	border-bottom: 1px solid #a0a0a0 !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr.overview,
+adapt-table > div.table-container > table > tbody > tr.overview > td.overview{
+	padding: 0px !important;
+	margin: 0px !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td.view-expand {
+	padding: 8px !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td.parent-view-select,
+adapt-table > div.table-container > table > tbody > tr > 
+	td.parent-view-select:hover {
+	border-top: 1px solid #a0a0a0 !important;
+	border-left: 1px solid #a0a0a0 !important;
+	border-right: 1px solid #a0a0a0 !important;
+	border-bottom: 1px solid #a0a0a0 !important;
+	background-color: #909090 !important;
+	color: #ffffff !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td.parent-view-select > span,
+adapt-table > div.table-container > table > tbody > tr > 
+	td.parent-view-select:hover > span{
+	cursor: pointer !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td.parent-view-hover,
+adapt-table > div.table-container > table > tbody > tr > 
+	td.parent-view-hover:hover {
+	background-color: #5e5e5e !important;
+	color: #ffffff !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr.divider {
+	width: 100% !important;
+	height: 1px !important;
+	background-color: #a0a0a0 !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td > div.identifier {
+	width: 4px !important;
+	display: inline-block !important;
+	margin-left: -8px !important;
+	margin-right: 4px !important;
+	background-color: #5e5e5e !important;
+	visibility: hidden;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td > div.controllers {
+	border: 1px solid #e0e0e0 !important;
+	margin-bottom: 1px !important;
+	padding: 2px !important;
+	display: none;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td div.overview {
+	border: 1px solid #e0e0e0 !important;
+	margin-bottom: 1px !important;
+	padding: 2px !important;
+	display: none;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td div.overview overview-pane {
+	display: block;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td div.overview overview-pane > ol {
+	border-radius: 0px !important;
+	-moz-border-radius: 0px !important;
+	-webkit-border-radius: 0px !important;
+	margin-bottom: 0px !important;
+}			
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td div.overview-active {
+	display: block !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td div.overview-active > overview-pane
+	.ancestry > span {
+	text-transform: capitalize;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td div.overview-active > overview-pane
+	.ancestry > i.separator{
+	margin-left: 12px;
+	color: #a0a0a0;
+	cursor: normal !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td div.overview-active > overview-pane
+	.ancestry > .row-reference:before {
+	content: ":";
+	letter-spacing: 1px;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td div.overview-active > overview-pane
+	.ancestry > .column-reference {
+	margin-right: 1px;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td div.overview-active > overview-pane
+	.ancestry.object:nth-child(n+1):before {
+	content: "";
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td div.overview-active > overview-pane 
+	.ancestry.array:nth-child(n+1):before {
+	content: "";
+}
+
+adapt-table > div.table-container > table > tbody > tr > td > 
+	div > view-controllers > button:first-child {
+	margin-right: 1px;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td > 
+	div > view-controllers > button:last-child {
+	margin-left: 1px;
+	margin-right: 0px !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td > 
+	div > view-controllers > button:nth-child(n+1) {
+	margin-left: 1px;
+	margin-right: 1px;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td > 
+	div.controllers-active {
+	display: block !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td > 
+	div.controllers-active button.btn {
+	border-radius: 0px;
+	-moz-border-radius: 0px;
+	-webkit-border-radius: 0px;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td > 
+	div.controllers-active > view-controllers {
+	display: block;
+}
+
+adapt-table > div.table-container > table > tbody > tr > td > adapt-view {
+	display: inline-block !important;
+	margin-left: 0px !important;
+	padding: 0px !important;
+	width: 100% !important;
+}
+
+@media screen and (max-width: 800px) {
+	adapt-table > div.table-container > table > tbody > tr > td > 
+		div > view-controllers > button > span {
+		display: none !important;
+	}
+	adapt-table > div.table-container > table > tbody > tr > td > 
+		div > view-controllers > button > i {
+		margin-right: 0px !important;
+	}
+}

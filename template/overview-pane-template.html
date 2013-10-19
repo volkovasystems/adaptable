@@ -8,7 +8,7 @@
 		<span class="column-reference" ng-bind="ancestry.column"></span> 
 		<span class="row-reference" ng-bind="ancestry.row"></span> 
 		<i class="separator glyphicon glyphicon-chevron-right" 
-			ng-if="( $index 1 ) < ancestryList.length"></i>
+			ng-if="( $index + 1 ) < ancestryList.length"></i>
 	</li>
 	<li ng-repeat="info in infoList" 
 		class="info">

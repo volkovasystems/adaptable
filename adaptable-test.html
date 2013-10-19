@@ -6,14 +6,184 @@
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 		<link href="http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" type="text/css"></link>
-		<link href="style/adapt-table-style.less" rel="stylesheet" type="text/css"></link>
+		<link href="adapt-table-style.less" rel="stylesheet" type="text/css"></link>
 		<script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/1.4.1/less.min.js"></script>
 		<script src="adaptable.js"></script>
-		<script>
-			
-		</script>
 	</head>
-	<body>
-		
+	<body ng-app="adaptable">
+		<div>
+		</div>
+		<script>
+			var data = [
+				{
+					"a": "sample value a",
+					"b": "sample value b",
+					"c": "sample value c",
+					"d": "sample value d",
+					"e": "sample value e"
+				},
+				{
+					"a": "sample value a",
+					"b": "sample value b",
+					"c": "sample value c",
+					"d": "sample value d",
+					"e": "sample value e"
+				},
+				{
+					"a": "sample value a",
+					"b": "sample value b",
+					"c": "sample value c",
+					"d": "sample value d",
+					"e": "sample value e"
+				},
+				{
+					"a": "sample value a",
+					"b": "sample value b",
+					"c": "sample value c",
+					"d": "sample value d",
+					"e": "sample value e",
+					"g": "sample value g"
+				},
+				{
+					"a": "sample value a",
+					"b": "sample value b",
+					"c": "sample value c",
+					"d": "sample value d",
+					"e": "sample value e"
+				},
+				{
+					"f": "sample value f",
+					"g": [
+						1,
+						2,
+						3,
+						4,
+						{
+							"1": "sample 1",
+							"2": "sample 2",
+							"3": "sample 3",
+							"b": {
+								"1": "sample 1",
+								"2": "sample 2",
+								"3": {
+									"z": 5,
+									"y": 6
+								}
+							}
+						}
+					]
+				},
+				{
+					"a": {
+						"1": "sample 1",
+						"2": "sample 2",
+						"3": "sample 3"
+					},
+					"f": {
+						"1": "sample 1f",
+						"2": "sample 2f",
+						"3": "sample 3f"
+					},
+					"q": [
+						{
+							"a": "sample value a",
+							"b": "sample value b",
+							"c": "sample value c",
+							"d": "sample value d",
+							"e": "sample value e",
+							"f": {
+								"1": "sample 1f",
+								"2": "sample 2f",
+								"3": "sample 3f"
+							},
+							"g": "sample value g",
+							"h": "sample value h",
+							"i": "sample value i",
+							"j": "sample value j"
+						},
+						{
+							"a": "sample value a",
+							"b": "sample value b",
+							"c": "sample value c",
+							"d": "sample value d",
+							"e": "sample value e",
+							"f": "sample value f",
+							"g": "sample value g",
+							"h": "sample value h",
+							"i": "sample value i",
+							"j": "sample value j"
+						},
+						{
+							"a": "sample value a",
+							"b": "sample value b",
+							"c": "sample value c",
+							"d": "sample value d",
+							"e": "sample value e",
+							"f": "sample value f",
+							"g": "sample value g",
+							"h": "sample value h",
+							"i": "sample value i",
+							"j": "sample value j"
+						}
+					]
+				},
+				{
+					"b": {
+						"1": "sample 1",
+						"2": "sample 2",
+						"3": {
+							"z": 5,
+							"y": 6
+						}
+					},
+					"d": [
+						{
+							"a": "sample value a",
+							"b": "sample value b",
+							"c": "sample value c",
+							"d": "sample value d",
+							"e": "sample value e"
+						},
+						{
+							"a": "sample value a",
+							"b": "sample value b",
+							"c": "sample value c",
+							"d": "sample value d",
+							"e": "sample value e",
+							"g": "sample value g"
+						},
+						{
+							"a": "sample value a",
+							"b": "sample value b",
+							"c": "sample value c",
+							"d": "sample value d",
+							"e": "sample value e"
+						},
+						{
+							"a": {
+								"1": "sample 1",
+								"2": "sample 2",
+								"3": "sample 3"
+							},
+							"f": {
+								"1": "sample 1f",
+								"2": "sample 2f",
+								"3": "sample 3f"
+							}
+						}	
+					]
+				}
+			];
+
+			var module = angular.module( "adaptable", [ ] );
+			var adaptable = new Adaptable( );
+			adaptable
+				.integrate( module )
+				.build( {
+					"parent": $( "div" ),
+					"columns": 7,
+					"data": data
+				} );
+		</script>
 	</body>
 </html>

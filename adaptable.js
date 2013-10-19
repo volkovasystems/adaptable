@@ -60,9 +60,11 @@ Adaptable.prototype.build = function build( options ){
 		throw new Error( "cannot build, no resources loaded" );
 	}
 
+	//This is where the adaptive table will be attached.
 	if( "parent" in options ){
 		this.parent = $( options.parent );
 	}
+
 	if( "data" in options ){
 		this.data = options.data;
 		if( typeof this.data == "object" ){
@@ -82,7 +84,7 @@ Adaptable.prototype.build = function build( options ){
 
 	var adaptable = $( "<adapt-table></adapt-table>" )
 		.attr( {
-			"data": this.data,
+			"xdata": this.data,
 			"columns": this.columns,
 			"id": this.id
 		} );
@@ -94,12 +96,14 @@ Adaptable.prototype.build = function build( options ){
 
 	//This is used to call $compile in any function.
 	angular.injector( [ "ng" ] )
-		.invoke( [ "$compile", "$rootScope", 
+		.invoke( [ "$compile", "$rootScope",
 			function( $compile, $rootScope ){
-				if( !self.scope ){
-					self.scope = $rootScope.$new( true );
+				if( self.scope ){
+					$compile( self.parent.find( "#" + self.id )[ 0 ] )( self.scope );
+				}else{
+					$compile( self.parent.find( "#" + self.id )[ 0 ] )( $rootScope );	
 				}
-				$compile( self.parent.find( "#" + self.id )[ 0 ] )( self.scope );
+				
 			} ] );
 
 	return this;
@@ -218,6 +222,7 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 
 							$scope.$on( "adjust-dividers",
 								function( ){
+									console.debug( "self: ", view.self );
 									view.identifier.css( "height", view.self.height( ) );
 								} );
 
@@ -515,6 +520,7 @@ Adaptable.createAdaptTableDirective = function createAdaptTableDirective( adapta
 					"controller": "AdaptTableController",
 					"templateUrl": "template/adapt-table-template.html", 
 					"scope": {
+						"xdata": "@?",
 						"data": "=?",
 						"view": "=?",
 						"reference": "=?",
@@ -534,8 +540,9 @@ Adaptable.createAdaptTableDirective = function createAdaptTableDirective( adapta
 							scope.level = 1;
 						}
 
-						if( typeof scope.data == "string" ){
-							scope.data = JSON.parse( scope.data );
+						if( typeof scope.xdata == "string" ){
+							scope.data = JSON.parse( scope.xdata );
+							container.attr( "xdata", "" );
 						}
 						
 						//This will only auto complete or reduce the row elements.
@@ -878,95 +885,98 @@ Adaptable.createAdaptViewDirective = function createAdaptViewDirective( adaptabl
 						"level": "=?"
 					},
 					"link": function( scope, element ){
-						var reference = scope.data.$reference;
-						var viewType = scope.data.$viewType;
-						var columnAncestry = scope.data.$columnAncestry;
-						var rowAncestry = scope.data.$rowAncestry;
-
-						scope.reference = reference;
-						scope.viewType = viewType;
-						scope.columnAncestry = columnAncestry;
-						scope.rowAncestry = rowAncestry;
-
-						var adaptTableView = $( "<adapt-table></adapt-table>" );
-						adaptTableView.attr( {
-							"data": "data",
-							"view": "true",
-							"reference": reference,
-							"level": scope.level,
-							"column-ancestry": columnAncestry,
-							"row-ancestry": rowAncestry
-						} );
-								
-						var container = $( element );
-						container
-							.attr( "reference", reference )
-							.append( adaptTableView );
-
-						$compile( element.contents( ) )( scope );
-
 						$timeout( function( ){
-							var view = $( "adapt-view[reference='" + reference + "']" );
-							if( view.length == 1 ){
-								view.detach( );
+							var reference = scope.data.$reference;
+							var viewType = scope.data.$viewType;
+							var columnAncestry = scope.data.$columnAncestry;
+							var rowAncestry = scope.data.$rowAncestry;
 
-								var headerLength = scope.$parent.header.length;
-								
-								var controllers = $( "<div></div>" )
-									.addClass( "controllers col-md-12" )
-									.attr( "parent-reference", reference );
+							scope.reference = reference;
+							scope.viewType = viewType;
+							scope.columnAncestry = columnAncestry;
+							scope.rowAncestry = rowAncestry;
 
-								var overview = $( "<div></div>" )
-									.addClass( "overview col-md-12" )
-									.attr( "column-ancestry", columnAncestry )
-									.attr( "row-ancestry", rowAncestry )
-									.attr( "parent-reference", reference );
+							var adaptTableView = $( "<adapt-table></adapt-table>" );
+							adaptTableView.attr( {
+								"data": "data",
+								"view": "true",
+								"reference": reference,
+								"level": scope.level,
+								"column-ancestry": columnAncestry,
+								"row-ancestry": rowAncestry
+							} );
+									
+							var container = $( element );
+							container
+								.attr( "reference", reference )
+								.append( adaptTableView );
 
-								var identifier = $( "<div></div>" )
-									.addClass( "identifier" )
-									.attr( "parent-reference", reference );
+							$compile( element.contents( ) )( scope );
 
-								var viewTd = $( "<td></td>" )
-									.addClass( "sub-container" )
-									.attr( "colspan", headerLength )
-									.mouseover( function( ){
-										scope.hoverOn( reference );
-									} )
-									.mouseout( function( ){
-										scope.hoverOff( reference );
-									} )
-									.append( controllers )
-									.append( overview )
-									.append( identifier )
-									.append( view );
+							$timeout( function( ){
+								var view = $( "adapt-view[reference='" + reference + "']" );
+								if( view.length == 1 ){
+									view.detach( );
 
-								var viewTr = $( "<tr></tr>" )
-									.append( viewTd )
-									.hide( );
+									var headerLength = scope.$parent.header.length;
+									
+									var controllers = $( "<div></div>" )
+										.addClass( "controllers col-md-12" )
+										.attr( "parent-reference", reference );
 
-								var dividerTrTop = $( "<tr></tr>" )
-									.addClass( "divider" )
-									.attr( "parent-reference", reference )
-									.hide( );
+									var overview = $( "<div></div>" )
+										.addClass( "overview col-md-12" )
+										.attr( "column-ancestry", columnAncestry )
+										.attr( "row-ancestry", rowAncestry )
+										.attr( "parent-reference", reference );
 
-								var dividerTrBottom = $( "<tr></tr>" )
-									.addClass( "divider" )
-									.attr( "parent-reference", reference )
-									.hide( );
+									var identifier = $( "<div></div>" )
+										.addClass( "identifier" )
+										.attr( "parent-reference", reference );
 
-								var spacerTr = $( "<tr></tr>" )
-									.addClass( "spacer" )
-									.attr( "parent-reference", reference )
-									.hide( );
+									var viewTd = $( "<td></td>" )
+										.addClass( "sub-container" )
+										.attr( "colspan", headerLength )
+										.mouseover( function( ){
+											scope.hoverOn( reference );
+										} )
+										.mouseout( function( ){
+											scope.hoverOff( reference );
+										} )
+										.append( controllers )
+										.append( overview )
+										.append( identifier )
+										.append( view );
 
-								$( "td[reference='" + reference + "']" )
-									.parents( "tbody" )
-									.append( dividerTrTop )
-									.append( viewTr )
-									.append( dividerTrBottom )
-									.append( spacerTr );
-							}
+									var viewTr = $( "<tr></tr>" )
+										.append( viewTd )
+										.hide( );
+
+									var dividerTrTop = $( "<tr></tr>" )
+										.addClass( "divider" )
+										.attr( "parent-reference", reference )
+										.hide( );
+
+									var dividerTrBottom = $( "<tr></tr>" )
+										.addClass( "divider" )
+										.attr( "parent-reference", reference )
+										.hide( );
+
+									var spacerTr = $( "<tr></tr>" )
+										.addClass( "spacer" )
+										.attr( "parent-reference", reference )
+										.hide( );
+
+									$( "td[reference='" + reference + "']" )
+										.parents( "tbody" )
+										.append( dividerTrTop )
+										.append( viewTr )
+										.append( dividerTrBottom )
+										.append( spacerTr );
+								}
+							}, 0 );
 						}, 0 );
+						
 					}
 				}
 			} );	
@@ -1089,30 +1099,10 @@ Adaptable.createViewControllersDirective = function createViewControllersDirecti
 						"data": "=?",
 						"viewType": "@?"
 					},
-					"template":
-						"<button class=\"view-table btn\">" +
-							"<i class=\"glyphicon glyphicon-th-large\"></i>" +
-							"<span>View as table.</span>" +
-						"</button>" +
-						"<button class=\"view-list btn\">" +
-							"<i class=\"glyphicon glyphicon-th-list\"></i>" +
-							"<span>View as list.</span>" +
-						"</button>" +
-						"<button class=\"view-map btn\">" +
-							"<i class=\"glyphicon glyphicon-move\"></i>" +
-							"<span>View as map.</span>" +
-						"</button>" +
-						"<button class=\"view-map btn\">" +
-							"<i class=\"glyphicon glyphicon-filter\"></i>" +
-							"<span>View filters.</span>" +
-						"</button>" + 
-						"<button class=\"view-overview btn\" " +
-							"ng-click=\"activateOverview(reference, viewType);\">" +
-							"<i class=\"glyphicon glyphicon-info-sign\"></i>" +
-							"<span>View overviews.</span>" +
-						"</button>",
+					"templateUrl": "template/view-controllers-template.html",
 					"link": function( scope, element ){
 						var container = $( element );
+						console.debug( container );
 
 						var reference = scope.reference;
 						var currentViewType = scope.viewType;
