@@ -221,7 +221,10 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 
 							$scope.$on( "adjust-dividers",
 								function( ){
-									view.identifier.css( "height", view.self.height( ) );
+									$timeout( function( ){
+										console.debug( view.identifier, view.self.height( ) );
+										view.identifier.css( "height", view.self.height( ) );
+									}, 0 );
 								} );
 
 							$scope.$on( "hover-on",
