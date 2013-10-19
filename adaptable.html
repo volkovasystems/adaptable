@@ -65,11 +65,18 @@
 			}
 
 			adapt-table > div.table-container > table > tbody > tr > td.view-select,
-			adapt-table > div.table-container > table > tbody > tr > td.view-select:hover {
+			adapt-table > div.table-container > table > tbody > tr > td.view-select:hover,
+			adapt-table > div.table-container > table > tbody > tr.overview > td.overview {
 				border-top: 1px solid #a0a0a0 !important;
 				border-left: 1px solid #a0a0a0 !important;
 				border-right: 1px solid #a0a0a0 !important;
 				border-bottom: 1px solid #a0a0a0 !important;
+			}
+
+			adapt-table > div.table-container > table > tbody > tr.overview,
+			adapt-table > div.table-container > table > tbody > tr.overview > td.overview{
+				padding: 0px !important;
+				margin: 0px !important;
 			}
 
 			adapt-table > div.table-container > table > tbody > tr > td.view-expand {
@@ -430,10 +437,6 @@
 						if( $scope.overviewReference != reference ){
 							$scope.overviewReference = reference;
 							$scope.$root.$broadcast( "pass-overview", reference, viewType );
-							
-							//Transfer when controls are activated.
-							$scope.$broadcast( "transfer-view-set", reference );
-							$scope.$broadcast( "close-view", reference, viewType, true );
 						}else{
 							$scope.overviewReference = null;
 							$scope.$root.$broadcast( "clear-overview", reference );
@@ -595,6 +598,35 @@
 													} );
 													view.overview.append( overviewPane );
 													$compile( view.overview.children( )[ 0 ] )( $scope );
+
+													//Create a tr for the overview.
+													var colspan = view.aTable.find( "tr:first-child > td" ).length;
+													var overviewTr = $( "<tr></tr>" )
+														.addClass( "overview" )
+														.attr( "reference", reference );
+													var overviewTd = $( "<td></td>" )
+														.addClass( "overview" )
+														.attr( "colspan", colspan )
+														.attr( "reference", reference );
+													var overviewSpacer = $( "<tr></tr>" )
+														.addClass( "overview spacer" )
+														.attr( "reference", reference );
+													var overviewDividerTop = $( "<tr></tr>" )
+														.addClass( "overview divider" )
+														.attr( "reference", reference );
+													var overviewDividerBottom = $( "<tr></tr>" )
+														.addClass( "overview divider" )
+														.attr( "reference", reference );
+
+													overviewTr.append( overviewTd );
+
+													view.aTable.find( "tbody" )
+														.append( overviewDividerTop )
+														.append( overviewTr )
+														.append( overviewDividerBottom )
+														.append( overviewSpacer );
+
+													view.overviewSet = $( "tr.overview[reference='" + reference + "']" );
 												}
 												$timeout( function( ){
 													$scope.$emit( "adjust-dividers" );
@@ -1439,12 +1471,11 @@
 										.hide( );
 
 									$( "td[reference='" + reference + "']" )
-										.parent( )
-										.after( spacerTr )
-										.after( dividerTrBottom )
-										.after( viewTr );
-
-									viewTr.before( dividerTrTop );
+										.parents( "tbody" )
+										.append( dividerTrTop )
+										.append( viewTr )
+										.append( dividerTrBottom )
+										.append( spacerTr );
 								}
 							}, 0 );
 						}
