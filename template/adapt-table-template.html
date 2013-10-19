@@ -1,0 +1,56 @@
+<div class="table-container col-xs-12 col-sm-12 col-md-12">
+	<table class="col-xs-12 col-sm-12 col-md-12 table table-hover table-bordered table-striped">
+		<thead>
+			<tr>
+				<th ng-repeat="column in header track by $index"
+					column="{{ column }}">
+					<span ng-bind="column"></span>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="row in body track by $index">
+				<td ng-repeat="cell in row track by $index"
+					reference="{{ cell.$reference }}"
+					ng-mouseover="hoverOn( cell.$reference )"
+					ng-mouseleave="hoverOff( cell.$reference )"
+					ng-click="clickView( cell.$reference, viewTypeList[ cell.$reference ] )">
+					
+					<i class="view-type glyphicon glyphicon-th-large"
+						ng-if="cell.$reference && viewTypeList[ cell.$reference ] == 'table'">
+					</i>
+					<i class="view-type glyphicon glyphicon-th-list"
+						ng-if="cell.$reference && viewTypeList[ cell.$reference ] == 'list'">
+					</i>
+					<i class="view-type glyphicon glyphicon-move"
+						ng-if="cell.$reference && viewTypeList[ cell.$reference ] == 'map'">
+					</i>
+					<i class="view-controls glyphicon glyphicon-cog button-controller"
+						ng-show="controllerReference == cell.$reference"
+						ng-click="activateControllers( cell.$reference, viewTypeList[ cell.$reference ] ); $event.stopPropagation( );"
+						ng-if="cell.$reference">
+					</i>
+					
+					<span ng-bind="cell"></span>
+				</td>
+			</tr>
+			<adapt-view
+				class="col-md-12"
+				ng-repeat="view in views track by $index"
+				ng-mouseover="hoverOn( )"
+				ng-mouseleave="hoverOff( )"
+				level="( level 1 )"
+				view-type="viewType"
+				data="view">
+			</adapt-view>
+		</tbody>
+		<tfoot>
+			<tr>
+				<th ng-repeat="column in header track by $index"
+					column="{{ column }}">
+					<span ng-bind="column"></span>
+				</th>
+			</tr>
+		</tfoot>
+	</table>
+</div>

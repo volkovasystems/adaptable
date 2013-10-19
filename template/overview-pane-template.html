@@ -1,0 +1,17 @@
+<ol class="breadcrumb"> 
+	<li ng-repeat="ancestry in ancestryList" 
+		class="ancestry {{ ancestry.type }}">
+		<i class="glyphicon glyphicon-align-justify"  
+			ng-if="ancestry.type == 'array'"></i>
+		<i class="glyphicon glyphicon-unchecked" 
+			ng-if="ancestry.type == 'object'"></i>
+		<span class="column-reference" ng-bind="ancestry.column"></span> 
+		<span class="row-reference" ng-bind="ancestry.row"></span> 
+		<i class="separator glyphicon glyphicon-chevron-right" 
+			ng-if="( $index 1 ) < ancestryList.length"></i>
+	</li>
+	<li ng-repeat="info in infoList" 
+		class="info">
+		<span ng-bind=""></span>
+	</li>
+</ol>
