@@ -128,7 +128,6 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 	if( !Adaptable.adaptTableControllerCreated ){
 		adaptable.module.controller( "AdaptTableController",
 			function( $scope, $timeout, $compile ){
-
 				$scope.activateControllers = function activateControllers( reference, viewType ){
 					if( $scope.controllerReference != reference ){
 						$scope.$root.$broadcast( "pass-controllers", reference );
@@ -222,7 +221,6 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 
 							$scope.$on( "adjust-dividers",
 								function( ){
-									console.debug( "self: ", view.self );
 									view.identifier.css( "height", view.self.height( ) );
 								} );
 
@@ -968,11 +966,12 @@ Adaptable.createAdaptViewDirective = function createAdaptViewDirective( adaptabl
 										.hide( );
 
 									$( "td[reference='" + reference + "']" )
-										.parents( "tbody" )
-										.append( dividerTrTop )
-										.append( viewTr )
-										.append( dividerTrBottom )
-										.append( spacerTr );
+										.parent( )
+										.after( spacerTr )
+										.after( dividerTrBottom )
+										.after( viewTr );
+
+									viewTr.before( dividerTrTop );
 								}
 							}, 0 );
 						}, 0 );
@@ -1102,7 +1101,6 @@ Adaptable.createViewControllersDirective = function createViewControllersDirecti
 					"templateUrl": "template/view-controllers-template.html",
 					"link": function( scope, element ){
 						var container = $( element );
-						console.debug( container );
 
 						var reference = scope.reference;
 						var currentViewType = scope.viewType;

@@ -1471,11 +1471,12 @@
 										.hide( );
 
 									$( "td[reference='" + reference + "']" )
-										.parents( "tbody" )
-										.append( dividerTrTop )
-										.append( viewTr )
-										.append( dividerTrBottom )
-										.append( spacerTr );
+										.parent( )
+										.after( spacerTr )
+										.after( dividerTrBottom )
+										.after( viewTr );
+
+									viewTr.before( dividerTrTop );
 								}
 							}, 0 );
 						}
