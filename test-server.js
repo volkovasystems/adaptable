@@ -4,8 +4,8 @@ var fs = require( "fs" );
 
 http.createServer( function( request, response ){
 	var urlObject = url.parse( request.url );
-	console.log( JSON.stringify( urlObject ) );
 	if( urlObject.pathname == "/" ){
+		console.log( "Serving file: adaptable-test.html" );
 		fs.readFile( "./adaptable-test.html",
 			{ "encoding": "utf8" },
 			function( error, data ){
@@ -18,6 +18,7 @@ http.createServer( function( request, response ){
 		fs.exists( "." + urlObject.pathname,
 			function( exists ){
 				if( exists ){
+					console.log( "Serving file: ", urlObject.pathname );
 					fs.readFile( "." + urlObject.pathname,
 						{ "encoding": "utf8" },
 						function( error, data ){

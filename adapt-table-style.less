@@ -1,6 +1,23 @@
-i {
-	margin-right: 3px;
+.simple-borders( ){
+	border-top: 1px solid #a0a0a0 !important;
+	border-left: 1px solid #a0a0a0 !important;
+	border-right: 1px solid #a0a0a0 !important;
+	border-bottom: 1px solid #a0a0a0 !important;
+}
+
+.remove-round-borders( ){
+	border-radius: 0px !important;
+	-moz-border-radius: 0px !important;
+	-webkit-border-radius: 0px !important;
+}
+
+.clickable {
 	cursor: pointer;
+}
+
+i {
+	.clickable;
+	margin-right: 3px;
 	font-size: 15.5px !important;
 	text-shadow:0.5px 0.5px 2px #a0a0a0 !important;
 }
@@ -58,10 +75,7 @@ adapt-table > div.table-container > table > tbody > tr > td.sub-container {
 adapt-table > div.table-container > table > tbody > tr > td.view-select,
 adapt-table > div.table-container > table > tbody > tr > td.view-select:hover,
 adapt-table > div.table-container > table > tbody > tr.overview > td.overview {
-	border-top: 1px solid #a0a0a0 !important;
-	border-left: 1px solid #a0a0a0 !important;
-	border-right: 1px solid #a0a0a0 !important;
-	border-bottom: 1px solid #a0a0a0 !important;
+	.simple-borders;
 }
 
 adapt-table > div.table-container > table > tbody > tr.overview,
@@ -78,10 +92,7 @@ adapt-table > div.table-container > table > tbody > tr >
 	td.parent-view-select,
 adapt-table > div.table-container > table > tbody > tr > 
 	td.parent-view-select:hover {
-	border-top: 1px solid #a0a0a0 !important;
-	border-left: 1px solid #a0a0a0 !important;
-	border-right: 1px solid #a0a0a0 !important;
-	border-bottom: 1px solid #a0a0a0 !important;
+	.simple-borders;
 	background-color: #909090 !important;
 	color: #ffffff !important;
 }
@@ -89,7 +100,7 @@ adapt-table > div.table-container > table > tbody > tr >
 adapt-table > div.table-container > table > tbody > tr > 
 	td.parent-view-select > span,
 adapt-table > div.table-container > table > tbody > tr > 
-	td.parent-view-select:hover > span{
+	td.parent-view-select:hover > span {
 	cursor: pointer !important;
 }
 
@@ -131,17 +142,27 @@ adapt-table > div.table-container > table > tbody > tr > td div.overview {
 }
 
 adapt-table > div.table-container > table > tbody > tr > 
-	td div.overview overview-pane {
+	td div.overview overview-pane,
+adapt-table > div.table-container > table > tbody > tr > 
+	td.overview overview-pane {
 	display: block;
 }
 
 adapt-table > div.table-container > table > tbody > tr > 
-	td div.overview overview-pane > ol {
-	border-radius: 0px !important;
-	-moz-border-radius: 0px !important;
-	-webkit-border-radius: 0px !important;
+	td div.overview overview-pane > ol,
+adapt-table > div.table-container > table > tbody > tr > 
+	td.overview overview-pane > ol {
+	.remove-round-borders;
 	margin-bottom: 0px !important;
-}			
+	padding: 7px !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td div.overview overview-pane > ol > li,
+adapt-table > div.table-container > table > tbody > tr > 
+	td.overview overview-pane > ol > li {
+	display: inline !important;
+}
 
 adapt-table > div.table-container > table > tbody > tr > 
 	td div.overview-active {
@@ -150,13 +171,19 @@ adapt-table > div.table-container > table > tbody > tr >
 
 adapt-table > div.table-container > table > tbody > tr > 
 	td div.overview-active > overview-pane
+	.ancestry > span,
+adapt-table > div.table-container > table > tbody > tr > 
+	td > overview-pane
 	.ancestry > span {
 	text-transform: capitalize;
 }
 
 adapt-table > div.table-container > table > tbody > tr > 
 	td div.overview-active > overview-pane
-	.ancestry > i.separator{
+	.ancestry > i.separator,
+adapt-table > div.table-container > table > tbody > tr > 
+	td > overview-pane
+	.ancestry > i.separator {
 	margin-left: 12px;
 	color: #a0a0a0;
 	cursor: normal !important;
@@ -164,6 +191,9 @@ adapt-table > div.table-container > table > tbody > tr >
 
 adapt-table > div.table-container > table > tbody > tr > 
 	td div.overview-active > overview-pane
+	.ancestry > .row-reference:before,
+adapt-table > div.table-container > table > tbody > tr > 
+	td > overview-pane
 	.ancestry > .row-reference:before {
 	content: ":";
 	letter-spacing: 1px;
@@ -171,37 +201,44 @@ adapt-table > div.table-container > table > tbody > tr >
 
 adapt-table > div.table-container > table > tbody > tr > 
 	td div.overview-active > overview-pane
+	.ancestry > .column-reference,
+adapt-table > div.table-container > table > tbody > tr > 
+	td > overview-pane
 	.ancestry > .column-reference {
 	margin-right: 1px;
 }
 
 adapt-table > div.table-container > table > tbody > tr > 
 	td div.overview-active > overview-pane
+	.ancestry.object:nth-child(n+1):before,
+adapt-table > div.table-container > table > tbody > tr > 
+	td > overview-pane
 	.ancestry.object:nth-child(n+1):before {
 	content: "";
 }
 
 adapt-table > div.table-container > table > tbody > tr > 
 	td div.overview-active > overview-pane 
+	.ancestry.array:nth-child(n+1):before,
+adapt-table > div.table-container > table > tbody > tr > 
+	td > overview-pane 
 	.ancestry.array:nth-child(n+1):before {
 	content: "";
 }
 
-adapt-table > div.table-container > table > tbody > tr > td > 
-	div > view-controllers > button:first-child {
-	margin-right: 1px;
+adapt-table > div.table-container > table > tbody > 
+	tr.overview {
+	display: none;
 }
 
 adapt-table > div.table-container > table > tbody > tr > td > 
 	div > view-controllers > button:last-child {
-	margin-left: 1px;
 	margin-right: 0px !important;
 }
 
 adapt-table > div.table-container > table > tbody > tr > td > 
-	div > view-controllers > button:nth-child(n+1) {
-	margin-left: 1px;
-	margin-right: 1px;
+	div > view-controllers > button:nth-child(n) {
+	margin-right: -2px;
 }
 
 adapt-table > div.table-container > table > tbody > tr > td > 
@@ -211,9 +248,7 @@ adapt-table > div.table-container > table > tbody > tr > td >
 
 adapt-table > div.table-container > table > tbody > tr > td > 
 	div.controllers-active button.btn {
-	border-radius: 0px;
-	-moz-border-radius: 0px;
-	-webkit-border-radius: 0px;
+	.remove-round-borders;
 }
 
 adapt-table > div.table-container > table > tbody > tr > td > 

@@ -129,16 +129,20 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 		adaptable.module.controller( "AdaptTableController",
 			function( $scope, $timeout, $compile ){
 				$scope.activateControllers = function activateControllers( reference, viewType ){
-					if( $scope.controllerReference != reference ){
-						$scope.$root.$broadcast( "pass-controllers", reference );
-						$scope.$broadcast( "disable-view-type", reference, viewType );
-						$scope.$root.$broadcast( "clear-overview", reference );
-						$scope.$root.$broadcast( "clear-overview-reference" );
-
+					if( $scope.controllersReference != reference ){
 						//Transfer when controls are activated.
 						$scope.$broadcast( "transfer-view-set", reference );
 						$scope.$broadcast( "close-view", reference, viewType, true );
+
+						$scope.$root.$broadcast( "clear-overview", reference );
+						$scope.$root.$broadcast( "clear-overview-reference" );
+						
+						$scope.controllersReference = reference;
+						$scope.$root.$broadcast( "pass-controllers", reference );
+						$scope.$broadcast( "disable-view-type", reference, viewType );
 					}else{
+						$scope.controllersReference = null;
+						$scope.$root.$broadcast( "clear-controllers-reference" );
 						$scope.$root.$broadcast( "clear-controllers", reference );
 						$scope.$root.$broadcast( "clear-overview", reference );
 						$scope.$root.$broadcast( "clear-overview-reference" );
@@ -171,11 +175,12 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 					if( parentReference in $scope.viewCache ){
 						view = $scope.viewCache[ parentReference ];
 					}else{
+						//This will attach the data to the body of the table.
 						$scope.$broadcast( "set-body", parentReference );
 
 						$timeout( function( ){
 							view = $( "adapt-view[reference='" + parentReference + "']" );
-							var aTable = $( "> adapt-table", view );	
+							var aTable = $( "> adapt-table", view );
 							$scope.viewCache[ parentReference ] = {
 								"self": view,
 								"aTable": aTable,
@@ -222,7 +227,6 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 							$scope.$on( "adjust-dividers",
 								function( ){
 									$timeout( function( ){
-										console.debug( view.identifier, view.self.height( ) );
 										view.identifier.css( "height", view.self.height( ) );
 									}, 0 );
 								} );
@@ -258,7 +262,7 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 							$scope.$on( "pass-controllers",
 								function( event, reference ){
 									$( ".controllers-active" ).removeClass( "controllers-active" );
-									$scope.controllerReference = reference;
+									$scope.controllersReference = reference;
 									$timeout( function( ){
 										if( view.controllers.attr( "parent-reference" ) == reference ){
 											view.controllers.addClass( "controllers-active" );
@@ -281,7 +285,7 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 
 							$scope.$on( "clear-controllers",
 								function( event, reference ){
-									$scope.controllerReference = null;
+									$scope.controllersReference = null;
 									if( view.controllers.attr( "parent-reference" ) == reference ){
 										view.controllers.removeClass( "controllers-active" );
 										$timeout( function( ){
@@ -335,15 +339,40 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 
 												overviewTr.append( overviewTd );
 
-												view.aTable.find( "tbody" )
+												view.aTable.find( "tbody[parent-reference='" + reference + "']" )
 													.append( overviewDividerTop )
 													.append( overviewTr )
 													.append( overviewDividerBottom )
 													.append( overviewSpacer );
 
 												view.overviewSet = $( "tr.overview[reference='" + reference + "']" );
+
+												//We get all the td in the table and attach click events.
+												var tableTds = view.aTable.find( "tbody td[parent-reference='" + reference + "']" )
+													.addClass( "clickable" )
+													.click( function( ){
+														var td = $( this );
+														if( view.overviewSet.hasClass( "overview-active" )
+															&& !td.hasClass( "overview-active" ) )
+														{
+															tableTds.removeClass( "overview-active" );
+															td.addClass( "overview-active" );
+															td.parent( ).before( view.overviewSet.detach( ) );
+															overviewTd.append( overviewPane.detach( ) );
+															view.overviewSet.show( );				
+														}else if( view.overviewSet.hasClass( "overview-active" )
+															&& td.hasClass( "overview-active" ) )
+														{
+															tableTds.removeClass( "overview-active" );
+															view.overview.append( overviewPane.detach( ) );
+															view.overviewSet.hide( );
+															view.overviewSet.detach( );					
+														}
+													} );
 											}
+											
 											$timeout( function( ){
+												view.overviewSet.addClass( "overview-active" );
 												$scope.$emit( "adjust-dividers" );
 												$scope.$broadcast( "toggle-controller", reference, "overview", true );
 											}, 0 );
@@ -433,8 +462,8 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 									view.divider.hide( );
 									view.spacer.hide( );
 
-									$scope.$emit( "clear-controllers", reference );
-									$scope.$broadcast( "clear-controllers", reference );
+									$scope.$root.$broadcast( "clear-controllers", reference );
+									$scope.$root.$broadcast( "clear-controllers-reference" );
 								} );
 
 							$scope.$on( "click-view",
@@ -663,9 +692,10 @@ Adaptable.createAdaptTableDirective = function createAdaptTableDirective( adapta
 											}
 										} );
 
-									//Change after header changes.
+									//Change the row after header changes.
 									$timeout( function( ){
 										//Measure data density here.
+										//Note that data density here is based on the columns.
 										if( !scope.columns ){
 											scope.columns = 7;
 										}
@@ -1071,7 +1101,7 @@ Adaptable.createOverviewPaneDirective = function createOverviewPaneDirective( ad
 							}	
 						}
 						
-						// var childDataStructure = childData.constructor.name.toLowerCase( );
+						var childDataStructure = childData.constructor.name.toLowerCase( );
 						// scope.infoList
 					}
 				};
@@ -1127,6 +1157,11 @@ Adaptable.createViewControllersDirective = function createViewControllersDirecti
 						scope.$on( "clear-overview-reference",
 							function( event ){
 								scope.overviewReference = null;
+							} );
+
+						scope.$on( "clear-controllers-reference",
+							function( event ){
+								scope.controllersReference = null;
 							} );
 
 						scope.$on( "toggle-controller",
