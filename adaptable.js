@@ -365,8 +365,7 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 														{
 															tableTds.removeClass( "overview-active" );
 															view.overview.append( overviewPane.detach( ) );
-															view.overviewSet.hide( );
-															view.overviewSet.detach( );					
+															view.overviewSet.hide( );					
 														}
 													} );
 											}
@@ -385,6 +384,7 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 									$scope.overviewReference = null;
 									if( view.overview.attr( "parent-reference" ) == reference ){
 										view.overview.removeClass( "overview-active" );
+
 										$timeout( function( ){
 											$scope.$emit( "adjust-dividers" );
 											$scope.$broadcast( "toggle-controller", reference, "overview", false );

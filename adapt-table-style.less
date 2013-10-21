@@ -78,10 +78,21 @@ adapt-table > div.table-container > table > tbody > tr.overview > td.overview {
 	.simple-borders;
 }
 
-adapt-table > div.table-container > table > tbody > tr.overview,
-adapt-table > div.table-container > table > tbody > tr.overview > td.overview{
+adapt-table > div.table-container > table > tbody > tr.overview {
 	padding: 0px !important;
 	margin: 0px !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr.overview > td.overview {
+	padding: 3px !important;
+	margin: 0px !important;
+}
+
+adapt-table > div.table-container > table > tbody > tr > 
+	td.overview-active {
+	border-color: #a0a0a0 !important;
+	background-color: #a0a0a0 !important;
+	color: #ffffff !important
 }
 
 adapt-table > div.table-container > table > tbody > tr > td.view-expand {
@@ -196,7 +207,7 @@ adapt-table > div.table-container > table > tbody > tr >
 	td > overview-pane
 	.ancestry > .row-reference:before {
 	content: ":";
-	letter-spacing: 1px;
+	letter-spacing: 3px;
 }
 
 adapt-table > div.table-container > table > tbody > tr > 
@@ -221,7 +232,7 @@ adapt-table > div.table-container > table > tbody > tr >
 	td div.overview-active > overview-pane 
 	.ancestry.array:nth-child(n+1):before,
 adapt-table > div.table-container > table > tbody > tr > 
-	td > overview-pane 
+	td.overview-active > overview-pane 
 	.ancestry.array:nth-child(n+1):before {
 	content: "";
 }
