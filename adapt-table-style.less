@@ -1,8 +1,8 @@
-.simple-borders( ){
-	border-top: 1px solid #a0a0a0 !important;
-	border-left: 1px solid #a0a0a0 !important;
-	border-right: 1px solid #a0a0a0 !important;
-	border-bottom: 1px solid #a0a0a0 !important;
+.simple-borders( @color: #a0a0a0 ){
+	border-top: 1px solid @color !important;
+	border-left: 1px solid @color !important;
+	border-right: 1px solid @color !important;
+	border-bottom: 1px solid @color !important;
 }
 
 .remove-round-borders( ){
@@ -37,8 +37,23 @@ i.view-controls:hover {
 	text-shadow:0.5px 0.5px 4px #3276b1 !important;	
 }
 
+.root-container > adapt-table {
+	margin: 5px !important;
+}
+
 adapt-table {
 	display: block;
+}
+
+adapt-table div.root-controllers {
+	.simple-borders( #ddd );
+	padding: 2px;
+	margin-bottom: 1px;
+	display: none;
+}
+
+adapt-table div.root-controllers > button.view-controls {
+	.remove-round-borders;
 }
 
 adapt-table > div.table-container > table > tbody > tr > td >

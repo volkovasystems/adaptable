@@ -1,4 +1,13 @@
 <div class="table-container col-xs-12 col-sm-12 col-md-12">
+	<div class="col-xs-12 col-sm-12 col-md-12 root-controllers"
+		reference="{{ reference }}">
+		<button class="view-controls btn"
+			ng-click="activateControllers( reference, 'table' );">
+			<i class="glyphicon glyphicon-cog"></i>
+			<span ng-hide="rootControllersActive">View controllers.</span>
+			<span ng-show="rootControllersActive">Hide controllers.</span>
+		</button>
+	</div>
 	<table class="col-xs-12 col-sm-12 col-md-12 table table-hover table-bordered table-striped">
 		<thead>
 			<tr>
@@ -26,7 +35,7 @@
 						ng-if="cell.$reference && viewTypeList[ cell.$reference ] == 'map'">
 					</i>
 					<i class="view-controls glyphicon glyphicon-cog button-controller"
-						ng-show="controllerReference == cell.$reference"
+						ng-show="controllersReference == cell.$reference"
 						ng-click="activateControllers( cell.$reference, viewTypeList[ cell.$reference ] ); $event.stopPropagation( );"
 						ng-if="cell.$reference">
 					</i>

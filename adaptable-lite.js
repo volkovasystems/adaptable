@@ -65,11 +65,10 @@ Adaptable.prototype.build = function build( options ){
 		this.parent = $( options.parent );
 	}
 
-	if( "data" in options ){
-		this.data = options.data;
-		if( typeof this.data == "object" ){
-			this.data = JSON.stringify( this.data );
-		}
+	if( "data" in options 
+		&& typeof options.data == "object" )
+	{
+		this.data = JSON.stringify( options.data );
 	}
 	if( "scope" in options ){
 		this.scope = options.scope;
@@ -85,7 +84,9 @@ Adaptable.prototype.build = function build( options ){
 	var adaptable = $( "<adapt-table></adapt-table>" )
 		.attr( {
 			"xdata": this.data,
+			"data": "data",
 			"columns": this.columns,
+			"reference": "root",
 			"id": this.id
 		} );
 
@@ -103,7 +104,6 @@ Adaptable.prototype.build = function build( options ){
 				}else{
 					$compile( self.parent.find( "#" + self.id )[ 0 ] )( $rootScope );	
 				}
-				
 			} ] );
 
 	return this;
@@ -128,6 +128,10 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 		adaptable.module.controller( "AdaptTableController",
 			function( $scope, $timeout, $compile ){
 				$scope.activateControllers = function activateControllers( reference, viewType ){
+					if( reference == "root" ){
+						
+						return;
+					}
 					if( $scope.controllersReference != reference ){
 						//Transfer when controls are activated.
 						$scope.$broadcast( "transfer-view-set", reference );
@@ -174,8 +178,7 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 								"divider": $( "tr.divider[parent-reference='" + parentReference + "']" ),
 								"spacer": $( "tr.spacer[parent-reference='" + parentReference + "']" ),
 								"identifier": $( "div.identifier[parent-reference='" + parentReference + "']" ),
-								"controllers": $( "div.controllers[parent-reference='" + parentReference + "']" ),
-								"overview": $( "div.overview[parent-reference='" + parentReference + "']" )
+								"controllers": $( "div.controllers[parent-reference='" + parentReference + "']" )
 							}
 							view = $scope.viewCache[ parentReference ];
 
@@ -280,111 +283,6 @@ Adaptable.createAdaptTableController = function createAdaptTableController( adap
 										.find( ".controllers-active" );
 									if( activeControllers.length ){
 										activeControllers.removeClass( "controllers-active" );
-									}
-								} );
-
-							$scope.$on( "pass-overview",
-								function( event, reference, viewType ){
-									$( ".overview-active" ).removeClass( "overview-active" );
-									$scope.overviewReference = reference;
-									$timeout( function( ){
-										if( view.overview.attr( "parent-reference" ) == reference ){
-											view.overview.addClass( "overview-active" );
-											if( !view.overview.find( "overview-pane" ).length ){
-												var overviewPane = $( "<overview-pane></overview-pane>" );
-												overviewPane.attr( {
-													"reference": reference,
-													"data": "data",
-													"view-type": viewType,
-													"column-ancestry": view.overview.attr( "column-ancestry" ),
-													"row-ancestry": view.overview.attr( "row-ancestry" )
-												} );
-												view.overview.append( overviewPane );
-												$compile( view.overview.children( )[ 0 ] )( $scope );
-
-												//Create a tr for the overview.
-												var colspan = view.aTable.find( "tr:first-child > td" ).length;
-												var overviewTr = $( "<tr></tr>" )
-													.addClass( "overview" )
-													.attr( "reference", reference );
-												var overviewTd = $( "<td></td>" )
-													.addClass( "overview" )
-													.attr( "colspan", colspan )
-													.attr( "reference", reference );
-												var overviewSpacer = $( "<tr></tr>" )
-													.addClass( "overview spacer" )
-													.attr( "reference", reference );
-												var overviewDividerTop = $( "<tr></tr>" )
-													.addClass( "overview divider" )
-													.attr( "reference", reference );
-												var overviewDividerBottom = $( "<tr></tr>" )
-													.addClass( "overview divider" )
-													.attr( "reference", reference );
-
-												overviewTr.append( overviewTd );
-
-												view.aTable.find( "tbody[parent-reference='" + reference + "']" )
-													.append( overviewDividerTop )
-													.append( overviewTr )
-													.append( overviewDividerBottom )
-													.append( overviewSpacer );
-
-												view.overviewSet = $( "tr.overview[reference='" + reference + "']" );
-
-												//We get all the td in the table and attach click events.
-												var tableTds = view.aTable.find( "tbody td[parent-reference='" + reference + "']" )
-													.addClass( "clickable" )
-													.click( function( ){
-														var td = $( this );
-														if( view.overviewSet.hasClass( "overview-active" )
-															&& !td.hasClass( "overview-active" ) )
-														{
-															tableTds.removeClass( "overview-active" );
-															td.addClass( "overview-active" );
-															td.parent( ).before( view.overviewSet.detach( ) );
-															overviewTd.append( overviewPane.detach( ) );
-															view.overviewSet.show( );				
-														}else if( view.overviewSet.hasClass( "overview-active" )
-															&& td.hasClass( "overview-active" ) )
-														{
-															tableTds.removeClass( "overview-active" );
-															view.overview.append( overviewPane.detach( ) );
-															view.overviewSet.hide( );					
-														}
-													} );
-											}
-											
-											$timeout( function( ){
-												view.overviewSet.addClass( "overview-active" );
-												$scope.$emit( "adjust-dividers" );
-												$scope.$broadcast( "toggle-controller", reference, "overview", true );
-											}, 0 );
-										}
-									}, 0 );
-								} );
-
-							$scope.$on( "clear-overview",
-								function( event, reference ){
-									$scope.overviewReference = null;
-									if( view.overview.attr( "parent-reference" ) == reference ){
-										view.overview.removeClass( "overview-active" );
-
-										$timeout( function( ){
-											$scope.$emit( "adjust-dividers" );
-											$scope.$broadcast( "toggle-controller", reference, "overview", false );
-										}, 0 );
-									}
-									var activeOverview = $( "adapt-view[reference='" + reference + "']" )
-										.find( ".overview-active" );
-									if( activeOverview.length ){
-										activeOverview.removeClass( "overview-active" );
-										$scope.$emit( "toggle-controller", reference, "overview", false );
-									}else{
-										activeOverview = $( ".overview-active[reference!='" + reference + "']" );
-										if( activeOverview.length ){
-											activeOverview.removeClass( "overview-active" );
-											$scope.$root.$broadcast( "toggle-controller", reference, "overview", false );
-										}
 									}
 								} );
 
@@ -535,9 +433,9 @@ Adaptable.createAdaptTableDirective = function createAdaptTableDirective( adapta
 					"templateUrl": "template/adapt-table-template.html", 
 					"scope": {
 						"xdata": "@?",
+						"reference": "@?",
 						"data": "=?",
 						"view": "=?",
-						"reference": "=?",
 						"level": "=?",
 						"columns": "=?"
 					},
@@ -545,7 +443,38 @@ Adaptable.createAdaptTableDirective = function createAdaptTableDirective( adapta
 						var container = $( element );
 
 						if( scope.view ){
+							//This is a view so we have to hide it immediately.
 							container.hide( );
+						}else{
+							//Provide the root table functionalities.
+							$timeout( function( ){
+								var rootControllers = container.find( ".root-controllers[reference=\"root\"]" );
+								rootControllers
+									.find( "button" )
+										.mouseover( function( ){
+											var button = $( this );
+											if( !button.hasClass( "view-toggled" ) ){
+												button.addClass( "btn-primary" );
+											}
+										} )
+										.mouseout( function( ){
+											var button = $( this );
+											if( !button.hasClass( "view-toggled" ) ){
+												button.removeClass( "btn-primary" );
+											}
+										} );
+
+								rootControllers.show( );
+
+								var viewControllers = $( "<view-controllers></view-controllers>" );
+								viewControllers.attr( {
+									"reference": scope.reference,
+									"data": "data",
+									"view-type": "table"
+								} );
+								rootControllers.append( viewControllers );
+								$compile( rootControllers[ 0 ] )( $scope );
+							}, 0 );
 						}
 
 						if( !scope.level ){
@@ -555,6 +484,7 @@ Adaptable.createAdaptTableDirective = function createAdaptTableDirective( adapta
 						if( typeof scope.xdata == "string" ){
 							scope.data = JSON.parse( scope.xdata );
 							container.attr( "xdata", "" );
+							delete scope.xdata;
 						}
 						
 						//This will only auto complete or reduce the row elements.
@@ -606,7 +536,9 @@ Adaptable.createAdaptTableDirective = function createAdaptTableDirective( adapta
 
 									//Mark this as default table view.
 									var viewType = "table";
-									if( "reference" in scope ){
+									if( "reference" in scope 
+										&& scope.reference != "root" )
+									{
 										scope.$emit( "set-view-type", scope.reference, viewType );	
 									}
 
@@ -677,6 +609,7 @@ Adaptable.createAdaptTableDirective = function createAdaptTableDirective( adapta
 										//Measure data density here.
 										//Note that data density here is based on the columns.
 										if( !scope.columns ){
+											//Set default columns.
 											scope.columns = 7;
 										}
 										var currentColumnCount = scope.header.length;
@@ -688,7 +621,9 @@ Adaptable.createAdaptTableDirective = function createAdaptTableDirective( adapta
 										if( columnCount >= scope.columns ){
 											//Transform to list
 											viewType = "list";
-											if( "reference" in scope ){
+											if( "reference" in scope
+												&& scope.reference != "root" )
+											{
 												scope.$emit( "set-view-type", scope.reference, viewType );	
 											}
 
