@@ -14,6 +14,16 @@ http.createServer( function( request, response ){
 				} );
 				response.end( data );
 			} );
+	}else if( urlObject.pathname == "/lite" ){
+		console.log( "Serving file: adaptable-lite-test.html" );
+		fs.readFile( "./adaptable-lite-test.html",
+			{ "encoding": "utf8" },
+			function( error, data ){
+				response.writeHead( 200, {
+					"Content-Type": "text/html"
+				} );
+				response.end( data );
+			} );
 	}else{
 		fs.exists( "." + urlObject.pathname,
 			function( exists ){
