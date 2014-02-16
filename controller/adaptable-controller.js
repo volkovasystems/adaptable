@@ -1,13 +1,12 @@
-
 define( "adaptableController",
 	[
 		"angular"
 	],
-	function adaptableController( angular ){
+	function construct( angular ){
 		angular.module( "Adaptable" )
 			.controller( "adaptableController",
 				[
-					function controller( ){
+					function controller( $scope ){
 
 					}
 				] );

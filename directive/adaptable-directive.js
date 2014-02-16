@@ -12,12 +12,12 @@ define( "adaptableDirective",
 						Arbiter,
 						chance,
 						$,
-						require )
+						requirejs )
 	{
-		require.config( {
+		requirejs.config( {
 			"paths": {
-				"adaptableTemplate": "../template/adaptable-template.js",
-				"adaptableController": "../controller/adaptable-controller.js"
+				"adaptableTemplate": "/adaptable/template/adaptable-template.js",
+				"adaptableController": "/adaptable/controller/adaptable-controller.js"
 			}
 		} );
 

@@ -8,13 +8,13 @@
 		function construct( require, angular, _ ){
 			angular.moduel( "Adaptable", [ ] );
 
-			require.config( {
+			requirejs.config( {
 				"paths": {
-					"adaptableDirective": "./directive/adaptable-directive.js"
+					"adaptableDirective": "/adaptable/directive/adaptable-directive.js"
 				}
 			} );
 
-			require( [ 
+			requirejs( [ 
 					"adaptableDirective" 
 				],
 				function construct( adaptableDirective ){
