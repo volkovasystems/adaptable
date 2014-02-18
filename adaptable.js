@@ -2,16 +2,16 @@ try{ var base = window; }catch( error ){ base = exports; }
 ( function module( base ){
 	define( "adaptable", 
 		[
-			"require",
+			"requirejs",
+			"underscore",
 			"angular",
-			"underscore"
 		],
 		function construct( require, angular, _ ){
-			angular.moduel( "Adaptable", [ ] );
+			angular.module( "Adaptable", [ ] );
 
 			requirejs.config( {
 				"paths": {
-					"adaptableDirective": "/adaptable/directive/adaptable-directive.js"
+					"adaptableDirective": staticBaseUrl + "/adaptable/directive/adaptable-directive"
 				}
 			} );
 

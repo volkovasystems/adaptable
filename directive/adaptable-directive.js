@@ -1,14 +1,13 @@
 define( "adaptableDirective",
 	[
 		"amplify",
-		"angular",
 		"arbiter",
 		"chance",
 		"jquery",
-		"require"
+		"requirejs",
+		"angular"
 	],
 	function construct( amplify,
-						angular,
 						Arbiter,
 						chance,
 						$,
@@ -16,12 +15,12 @@ define( "adaptableDirective",
 	{
 		requirejs.config( {
 			"paths": {
-				"adaptableTemplate": "/adaptable/template/adaptable-template.js",
-				"adaptableController": "/adaptable/controller/adaptable-controller.js"
+				"adaptableTemplate": staticBaseUrl + "/adaptable/template/adaptable-template",
+				"adaptableController": staticBaseUrl + "/adaptable/controller/adaptable-controller"
 			}
 		} );
 
-		require( [
+		requirejs( [
 				"adaptableTemplate",
 				"adaptableController"
 			],

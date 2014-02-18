@@ -2,7 +2,7 @@ define( "adaptableController",
 	[
 		"angular"
 	],
-	function construct( angular ){
+	function construct( ){
 		angular.module( "Adaptable" )
 			.controller( "adaptableController",
 				[
