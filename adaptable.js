@@ -1,3 +1,4 @@
+try{ var base = window; }catch( error ){ base = exports; }
 ( function module( base ){
 	define( "adaptable", 
 		[
