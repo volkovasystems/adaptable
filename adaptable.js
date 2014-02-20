@@ -6,12 +6,12 @@ try{ var base = window; }catch( error ){ base = exports; }
 			"underscore",
 			"angular",
 		],
-		function construct( require, _ ){
+		function construct( ){
 			angular.module( "Adaptable", [ ] );
 
 			requirejs.config( {
 				"paths": {
-					"adaptableDirective": staticBaseUrl + "/adaptable/directive/adaptable-directive"
+					"adaptableDirective": staticBaseURL + "/adaptable/directive/adaptable-directive"
 				}
 			} );
 
@@ -25,7 +25,5 @@ try{ var base = window; }catch( error ){ base = exports; }
 
 					base.Adaptable = Adaptable;
 				}  );
-
-			return Adaptable;
 		} );
 } )( base );

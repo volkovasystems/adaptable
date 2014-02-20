@@ -7,16 +7,11 @@ define( "adaptableDirective",
 		"requirejs",
 		"angular"
 	],
-	function construct( amplify,
-						Arbiter,
-						chance,
-						$,
-						requirejs )
-	{
+	function construct( ){
 		requirejs.config( {
 			"paths": {
-				"adaptableTemplate": staticBaseUrl + "/adaptable/template/adaptable-template",
-				"adaptableController": staticBaseUrl + "/adaptable/controller/adaptable-controller"
+				"adaptableTemplate": staticBaseURL + "/adaptable/template/adaptable-template",
+				"adaptableController": staticBaseURL + "/adaptable/controller/adaptable-controller"
 			}
 		} );
 
